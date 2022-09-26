@@ -1,4 +1,4 @@
-# vuefirstapp
+# restaurantapp
 
 ## Project setup
 ```
