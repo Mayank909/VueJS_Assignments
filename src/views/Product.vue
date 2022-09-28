@@ -10,29 +10,37 @@
         <v-card-title class="ml-15 mt-15">
           <span class="font-weight-black text-h2"> Our Store </span>
           <br />
-          <p class=""><router-link style="text-decoration:none; color: inherit;" to="/">Home</router-link> / 
-          <span>{{ category }}</span></p>
+          <p class="">
+            <router-link style="text-decoration: none; color: inherit" to="/"
+              >Home</router-link
+            >
+            / <span>{{ category }}</span>
+          </p>
         </v-card-title>
       </v-img>
     </v-card>
+    <product-category />
   </section>
 </template>
 
 <script>
 import ProductCategory from "../components/ProductCategory.vue";
-import ProductTags from "../components/ProductTags.vue";
-import ProductList from "../components/ProductList.vue"
+import ProductList from "../components/ProductList.vue";
+import ProductAdd from "../components/ProductAdd.vue";
+import ProductEdit from "@/components/ProductEdit.vue";
+
 export default {
   name: "Product",
-  data(){
+  data() {
     return {
-      category: "Shop", 
-    }
+      category: "Shop",
+    };
   },
   components: {
     ProductCategory,
-    ProductTags,
-    ProductList
+    ProductList,
+    ProductAdd,
+    ProductEdit,
   },
 };
 </script>
