@@ -3,18 +3,16 @@
     <v-app id="inspire">
       <v-navigation-drawer permanent v-model="drawer" app>
         <v-list-item>
-          <v-list-item-content>
-            <v-list-item-title class="text-h6 pa-md-2">
-              <v-img
-                :aspect-ratio="20 / 5"
-                :width="width"
-                src="../../assets/applogo.png"
-              ></v-img>
-            </v-list-item-title>
-            <v-list-item-subtitle class="text-center pa-md-1 text-h6">
-              Restaurant
-            </v-list-item-subtitle>
-          </v-list-item-content>
+          <v-list-item-title class="text-h6 pa-md-2">
+            <v-img
+              :aspect-ratio="20 / 5"
+              :width="width"
+              src="../../assets/applogo.png"
+            ></v-img>
+          </v-list-item-title>
+          <v-list-item-subtitle class="text-center pa-md-1 text-h6">
+            Restaurant
+          </v-list-item-subtitle>
         </v-list-item>
 
         <v-divider></v-divider>
@@ -72,6 +70,7 @@ export default {
       { title: "ABOUT", icon: "mdi-help-box", to: "/about" },
       { title: "MENU", icon: "mdi-silverware", to: "/menu" },
       { title: "PRODUCT", icon: "mdi-food", to: "/product" },
+      { title: "PRODUCT CATEGORY", icon: "mdi-food", to: "/category" },
     ],
     width: 200,
   }),

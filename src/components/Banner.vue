@@ -1,13 +1,14 @@
 <template>
-  <section>
-    <v-card class="mx-auto fill-height" width="100%">
+    <section>
+    <v-card class="mx-auto" height="150px" width="100%">
       <v-img
-        class="fill-height white--text align-center"
+        cover
+        class="fill-height white--text "
         lazy-src="../assets/menu.jpg"
         width="100%"
         src="../assets/menu.jpg"
       >
-        <v-card-title class="ml-15 mt-15">
+        <v-card-title class="ml-15 mt-6">
           <span class="font-weight-black text-h2"> Our Store </span>
           <br />
           <p class="">
@@ -19,28 +20,19 @@
         </v-card-title>
       </v-img>
     </v-card>
-    <product-category />
   </section>
 </template>
 
 <script>
-import ProductCategory from "../components/ProductCategory.vue";
-import ProductList from "../components/ProductList.vue";
-import ProductAdd from "../components/ProductAdd.vue";
-import ProductEdit from "@/components/ProductEdit.vue";
-
 export default {
-  name: "Product",
   data() {
     return {
       category: "Shop",
     };
   },
-  components: {
-    ProductCategory,
-    ProductList,
-    ProductAdd,
-    ProductEdit,
-  },
-};
+}
 </script>
+
+<style>
+
+</style>
