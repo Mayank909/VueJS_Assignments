@@ -47,7 +47,7 @@
 
         <v-btn icon>
           <v-icon>mdi-cart-outline</v-icon>
-          <v-icon color="#b99272" class="zero-icon" size="20"
+          <v-icon color="primary" class="zero-icon" size="20"
             >mdi-numeric-0-circle</v-icon
           >
         </v-btn>
