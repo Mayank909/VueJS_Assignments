@@ -1,36 +1,45 @@
 <template>
-  <div class="container">
-    <form action="" method="post">
-      <div class="flex-column align-content-center">
-        <div>
-          <img :src="Userdata" alt="" />
-          <div v-if="isuploaded">
-            <img :src="Uploadedimg" alt="" />
-          </div>
+  <v-card class="container">
+    <form action="" method="post" enctype="multipart/form-data">
+      <div class="d-flex justify-evenly align-content-center">
+        <div class="image-area">
+          <input
+            type="file"
+            accept="image/*"
+            icon=""
+            @change="updateImg"
+            id="imgfile"
+            name="file"
+          />
+          <label for="file">
+            <v-card
+              @click="imageUploader"
+              color="secondary"
+              class="flex-column text-center pa-5"
+            >
+              <v-icon dense x-large>mdi-upload</v-icon>
+              <div>{{ defaultText }}</div>
+              <div>1920x1080 Pixels (16/9 aspect ratio)</div>
+              <div>Recommended.</div>
+              <div>Minmum image size is 5 MB</div>
+              <div>(PNG,JPG,JPEG permitted)</div>
+            </v-card>
+          </label>
         </div>
-        <br />
-        <label for="file"> </label>
-        <input
-          type="file"
-          accept="image/*"
-          method="Pour Over"
-          icon=""
-          @change="updateimg"
-          id="imgfile"
-          class="form-control-file"
-          name="file"
-        /><br />
-        <div class="preview ma-5">
-          <img src="#" id="imgPreview" alt="your img" />
+
+        <div class="preview">
+          <v-img
+            :aspect-ratio="16 / 9"
+            width="300"
+            :src="userData"
+            id="imgPreview"
+            alt="your image"
+          >
+          </v-img>
         </div>
-        <br />
-        <v-btn :disabled="isdisabled"
-         color="primary" @click.prevent="msgupdate" class="btn ma-5">
-          Upload Image
-        </v-btn>
       </div>
     </form>
-  </div>
+  </v-card>
 </template>
 
 <script>
@@ -38,28 +47,38 @@ export default {
   data() {
     return {
       isdisabled: false,
-      Userdata: "",
+      userData: require("../assets/inst1.jpeg"),
+      defaultText: "Upload",
     };
   },
   methods: {
     //For previewing the image file
-    updateimg() {
+    updateImg() {
       const [file] = imgfile.files;
       if (file) {
-        imgPreview.src = URL.createObjectURL(file);
+        this.userData = URL.createObjectURL(file);
+        this.msgupdate();
       }
     },
-    //For Uploding the image to the server
-    msgupdate() {
-      const [imageUpload] = imgfile.files;
-      const storage = getStorage();
-      const imageRef = ref(storage, `images/${imageUpload.name + ".jpeg"}`);
-      uploadBytes(imageRef, imageUpload).then(() => {
-        alert("Image Uploaded");
-      });
+    imageUploader() {
+      imgfile.click();
     },
+  },
+  //For Uploding the image to the server
+  msgupdate() {
+    const [imageUpload] = imgfile.files;
+    const storage = getStorage();
+    //imageUpload.split('.');
+    const imageRef = ref(storage, `images/${imageUpload.name + ".jpeg"}`);
+    uploadBytes(imageRef, imageUpload).then(() => {
+      alert("Image Uploaded");
+    });
   },
 };
 </script>
 
-<style></style>
+<style>
+input[type="file"] {
+  display: none;
+}
+</style>

@@ -1,63 +1,86 @@
 <template>
   <v-card>
-    <Banner />
+    <Banner :titleName="pageAction" />
     <v-card-text>
-      <v-container>
-       <form action="" method="post">
-        <v-row>
-          <v-col cols="12" sm="6" md="4">
-            <v-text-field
-              label="Catagory name"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" sm="6" md="4">
-            <v-text-field
-              label="Active"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <image-operation />
-        <v-btn
-      :loading="loading[1]"
-      :disabled="loading[1]"
-      class="ma-2"
-      color="primary"
-      @click="load(1)"
-    >
-      {{ action? "Edit Category" : "Add Category" }}
-    </v-btn>
-    <v-btn class="ma-2"
-      color="primary"
-    >
-      Cancel
-    </v-btn>
-    </form>
+      <v-container class="d-flex flex-wrap justify-space-between">
+        <ImageOperation />
+        <v-card class="mt-3">
+          <form action="" method="post">
+            <v-btn
+              :loading="loading[1]"
+              :disabled="loading[1]"
+              class="ma-2"
+              color="primary"
+              @click="load(1)"
+            >
+              {{ pageAction }}
+            </v-btn>
+            <v-btn class="ma-2" color="primary"> Cancel </v-btn>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  label="Catagory name"
+                  :rules="rules"
+                  hide-details="auto"
+                  class="ma-2 mt-4"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-combobox
+                  v-model="select"
+                  :items="items"
+                  label="Tags"
+                  multiple
+                  chips
+                ></v-combobox>
+              </v-col>
+              <v-col cols="12">
+                <v-switch
+                  v-model="switch1"
+                  inset
+                  :label="`Switch 1: ${switch1.toString()}`"
+                ></v-switch>
+              </v-col>
+            </v-row>
+          </form>
+        </v-card>
       </v-container>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
-import Banner from "@/components/Banner.vue"
-import ImageOperation from '@/components/ImageOperation.vue';
+import Banner from "@/components/Banner.vue";
+import ImageOperation from "@/components/ImageOperation.vue";
 export default {
   name: "productCategoryUpdate",
   components: {
     Banner,
     ImageOperation,
   },
-  data () {
-      return {
-        loading: [],
-        action: false,
-      }
+  data() {
+    return {
+      loading: [],
+      pageAction: this.categoryCheck(),
+      select: ["Vue"],
+      items: ["Programming", "Design", "Vue", "Vuetify"],
+      rules: [
+        (value) => !!value || "Required.",
+        (value) => (value && value.length >= 3) || "Min 3 characters",
+      ],
+      switch1: true,
+      switch2: false,
+    };
+  },
+  methods: {
+    load(i) {
+      this.loading[i] = true;
+      setTimeout(() => (this.loading[i] = false), 3000);
     },
-    methods: {
-      load (i) {
-        this.loading[i] = true
-        setTimeout(() => (this.loading[i] = false), 3000)
-      },
+    categoryCheck() {
+      return Number(this.$route.params.id) ? "Edit Category" : "Add Category";
     },
+  },
 };
 </script>
 

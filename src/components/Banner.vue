@@ -9,13 +9,13 @@
         src="../assets/menu.jpg"
       >
         <v-card-title class="ml-15 mt-6">
-          <span class="font-weight-black text-h2"> Our Store </span>
+          <span class="font-weight-black text-h2"> {{ titleName }} </span>
           <br />
           <p class="">
             <router-link style="text-decoration: none; color: inherit" to="/"
               >Home</router-link
             >
-            / <span>{{ category }}</span>
+            / Dashboard / <span>{{ titleName }}</span>
           </p>
         </v-card-title>
       </v-img>
@@ -25,9 +25,10 @@
 
 <script>
 export default {
+  props: ['titleName'],
   data() {
     return {
-      category: "Shop",
+      title: "",
     };
   },
 }

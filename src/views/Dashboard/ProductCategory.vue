@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Banner />
+    <Banner titleName="Category Editor" />
     <product-category-list />
   </div>
 </template>
