@@ -2,48 +2,67 @@
   <v-card>
     <Banner :titleName="pageAction" />
     <v-card-text>
-      <v-container class="d-flex flex-wrap justify-space-between">
-        <ImageOperation />
-        <v-card class="mt-3">
-          <form action="" method="post">
-            <v-btn
-              :loading="loading[1]"
-              :disabled="loading[1]"
-              class="ma-2"
-              color="primary"
-              @click="load(1)"
-            >
-              {{ pageAction }}
-            </v-btn>
-            <v-btn class="ma-2" color="primary"> Cancel </v-btn>
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  label="Catagory name"
-                  :rules="rules"
-                  hide-details="auto"
-                  class="ma-2 mt-4"
-                ></v-text-field>
+      <v-container color="primary">
+        <v-row no-gutters justify="end">
+          <v-col cols="12">
+            <v-card outline>
+              <v-col class="text-right">
+                <v-btn
+                  :loading="loading[1]"
+                  :disabled="loading[1]"
+                  class="ma-2"
+                  color="primary"
+                  @click="load(1)"
+                >
+                  {{ pageAction }}
+                </v-btn>
+                <v-btn class="ma-2" color="primary"> Cancel </v-btn>
               </v-col>
-              <v-col cols="12">
-                <v-combobox
-                  v-model="select"
-                  :items="items"
-                  label="Tags"
-                  multiple
-                  chips
-                ></v-combobox>
-              </v-col>
-              <v-col cols="12">
-                <v-switch
-                  v-model="switch1"
-                  inset
-                  :label="`Switch 1: ${switch1.toString()}`"
-                ></v-switch>
-              </v-col>
-            </v-row>
-          </form>
-        </v-card>
+            </v-card>
+          </v-col>
+          <v-col cols="12" md="6">
+            <h3 class="mt-2 mb-3">Image Upload</h3>
+            <ImageOperation />
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-card class="mt-3">
+              <form action="" method="post">
+                <v-row class="pa-2">
+                  <v-col cols="12" md="12">
+                    <v-text-field
+                      label="Catagory name"
+                      :rules="rules"
+                      hide-details="auto"
+                      color="primary"
+                      class="ma-2 mt-4"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" md="12">
+                    <v-combobox
+                      class="ma-2 mt-4"
+                      v-model="select"
+                      :items="items"
+                      label="Tags"
+                      color="primary"
+                      multiple
+                      chips
+                    ></v-combobox>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-switch
+                      v-model="isActive"
+                      color="primary"
+                      inset
+                      true-value="Active"
+                      false-value="Inactive"
+                      :label="isActive"
+                    ></v-switch>
+                  </v-col>
+                </v-row>
+              </form>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-container>
     </v-card-text>
   </v-card>
@@ -62,14 +81,21 @@ export default {
     return {
       loading: [],
       pageAction: this.categoryCheck(),
-      select: ["Vue"],
-      items: ["Programming", "Design", "Vue", "Vuetify"],
+      select: ["pizza"],
+      items: [
+        "burger",
+        "chicken",
+        "dishes",
+        "italian",
+        "menu",
+        "pizza",
+        "seafood",
+      ],
       rules: [
         (value) => !!value || "Required.",
         (value) => (value && value.length >= 3) || "Min 3 characters",
       ],
-      switch1: true,
-      switch2: false,
+      isActive: "Inactive",
     };
   },
   methods: {

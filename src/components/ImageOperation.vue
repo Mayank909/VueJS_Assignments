@@ -1,42 +1,33 @@
 <template>
-  <v-card class="container">
+  <v-card class="container" width="250" height="190">
     <form action="" method="post" enctype="multipart/form-data">
-      <div class="d-flex justify-evenly align-content-center">
-        <div class="image-area">
-          <input
-            type="file"
-            accept="image/*"
-            icon=""
-            @change="updateImg"
-            id="imgfile"
-            name="file"
-          />
-          <label for="file">
-            <v-card
-              @click="imageUploader"
-              color="secondary"
-              class="flex-column text-center pa-5"
-            >
-              <v-icon dense x-large>mdi-upload</v-icon>
-              <div>{{ defaultText }}</div>
-              <div>1920x1080 Pixels (16/9 aspect ratio)</div>
-              <div>Recommended.</div>
-              <div>Minmum image size is 5 MB</div>
-              <div>(PNG,JPG,JPEG permitted)</div>
-            </v-card>
-          </label>
-        </div>
-
-        <div class="preview">
-          <v-img
-            :aspect-ratio="16 / 9"
-            width="300"
-            :src="userData"
-            id="imgPreview"
-            alt="your image"
+      <div class="image-area">
+        <input
+          type="file"
+          accept="image/*"
+          icon=""
+          @change="updateImg"
+          id="imgfile"
+          name="file"
+        />
+        <label for="file">
+          <v-card
+            @click="imageUploader"
+            color="secondary"
+            width="250"
+            height="190"
           >
-          </v-img>
-        </div>
+            <v-img
+              cover
+              :aspect-ratio="12 / 9"
+              width="400"
+              :src="userData"
+              id="imgPreview"
+              alt="your image"
+            >
+            </v-img>
+          </v-card>
+        </label>
       </div>
     </form>
   </v-card>
@@ -46,7 +37,7 @@
 export default {
   data() {
     return {
-      isdisabled: false,
+      isDisabled: false,
       userData: require("../assets/inst1.jpeg"),
       defaultText: "Upload",
     };
@@ -61,6 +52,7 @@ export default {
       }
     },
     imageUploader() {
+      this.isDisabled = true;
       imgfile.click();
     },
   },
@@ -80,5 +72,8 @@ export default {
 <style>
 input[type="file"] {
   display: none;
+}
+.image-area {
+  width: 30%;
 }
 </style>
