@@ -11,8 +11,9 @@
                   :loading="loading[1]"
                   :disabled="loading[1]"
                   class="ma-2"
+                  v-if="!alert"
                   color="primary"
-                  @click="load(1)"
+                  @click="submitForm"
                 >
                   {{ pageAction }}
                 </v-btn>
@@ -35,12 +36,13 @@
                       hide-details="auto"
                       color="primary"
                       class="ma-2 mt-4"
+                      v-model="categoryName"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" md="12">
                     <v-combobox
                       class="ma-2 mt-4"
-                      v-model="select"
+                      v-model="selectedTags"
                       :items="items"
                       label="Tags"
                       color="primary"
@@ -57,6 +59,18 @@
                       false-value="Inactive"
                       :label="isActive"
                     ></v-switch>
+                    <v-alert
+                      v-model="alert"
+                      dismissible
+                      color="cyan"
+                      border="left"
+                      elevation="2"
+                      colored-border
+                      icon="mdi-twitter"
+                    >
+                      You've got <strong>5</strong> new updates on your
+                      timeline!.
+                    </v-alert>
                   </v-col>
                 </v-row>
               </form>
@@ -71,6 +85,8 @@
 <script>
 import Banner from "@/components/Banner.vue";
 import ImageOperation from "@/components/ImageOperation.vue";
+import useVuelidate from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 export default {
   name: "productCategoryUpdate",
   components: {
@@ -79,9 +95,14 @@ export default {
   },
   data() {
     return {
+      v$: useVuelidate(),
+      categoryName: "",
+      selectedTags: [],
+      alert: false,
+      isActive: false,
       loading: [],
       pageAction: this.categoryCheck(),
-      select: ["pizza"],
+      selectedTags: ["pizza"],
       items: [
         "burger",
         "chicken",
@@ -98,10 +119,28 @@ export default {
       isActive: "Inactive",
     };
   },
+  validations() {
+    return {
+      categoryName: { required },
+      selectedTags: { required },
+    };
+  },
   methods: {
     load(i) {
       this.loading[i] = true;
+      // this.submitForm();
       setTimeout(() => (this.loading[i] = false), 3000);
+    },
+    async submitForm() {
+      const isFormCorrect = await this.v$.$validate();
+
+      // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
+      if (!this.v$.$error) {
+        this.alert = true;
+      } else {
+        alert("Form Failed Validation.");
+      }
+      // actually submit form
     },
     categoryCheck() {
       return Number(this.$route.params.id) ? "Edit Category" : "Add Category";
