@@ -5,25 +5,29 @@
       <v-container color="primary">
         <v-row no-gutters justify="end">
           <v-col cols="12">
-            <v-card outline>
+            <v-alert type="success" v-model="alert">
+              {{ pageAction.split(" ").join("ed ") }} Sussessfully.
+            </v-alert>
+            <div>
               <v-col class="text-right">
                 <v-btn
                   :loading="loading[1]"
                   :disabled="loading[1]"
                   class="ma-2"
-                  v-if="!alert"
                   color="primary"
-                  @click="submitForm"
+                  @click="load(1)"
                 >
                   {{ pageAction }}
                 </v-btn>
-                <v-btn class="ma-2" color="primary"> Cancel </v-btn>
+                <v-btn class="ma-2" color="primary" @click="clearFields">
+                  Cancel
+                </v-btn>
               </v-col>
-            </v-card>
+            </div>
           </v-col>
           <v-col cols="12" md="6">
             <h3 class="mt-2 mb-3">Image Upload</h3>
-            <ImageOperation />
+            <ImageOperation @selectedImage="getImage" />
           </v-col>
           <v-col cols="12" md="6">
             <v-card class="mt-3">
@@ -37,7 +41,16 @@
                       color="primary"
                       class="ma-2 mt-4"
                       v-model="categoryName"
+                      :error="v$.categoryName.$error"
                     ></v-text-field>
+                    <p
+                      style="color: #b00a20"
+                      class="mr-2 ml-2 text-caption"
+                      v-for="error of v$.categoryName.$errors"
+                      :key="error.$uid"
+                    >
+                      {{ error.$message }}
+                    </p>
                   </v-col>
                   <v-col cols="12" md="12">
                     <v-combobox
@@ -46,31 +59,30 @@
                       :items="items"
                       label="Tags"
                       color="primary"
+                      :error="v$.selectedTags.$error"
                       multiple
                       chips
                     ></v-combobox>
+                    <p
+                      style="color: #b00a20"
+                      class="mr-2 ml-2 text-caption"
+                      :class="error.$color"
+                      v-for="error of v$.selectedTags.$errors"
+                      :key="error.$uid"
+                    >
+                      {{ error.$message }}
+                    </p>
                   </v-col>
                   <v-col cols="12" md="6">
                     <v-switch
                       v-model="isActive"
+                      class="ma-2"
                       color="primary"
                       inset
                       true-value="Active"
                       false-value="Inactive"
                       :label="isActive"
                     ></v-switch>
-                    <v-alert
-                      v-model="alert"
-                      dismissible
-                      color="cyan"
-                      border="left"
-                      elevation="2"
-                      colored-border
-                      icon="mdi-twitter"
-                    >
-                      You've got <strong>5</strong> new updates on your
-                      timeline!.
-                    </v-alert>
                   </v-col>
                 </v-row>
               </form>
@@ -86,7 +98,9 @@
 import Banner from "@/components/Banner.vue";
 import ImageOperation from "@/components/ImageOperation.vue";
 import useVuelidate from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
+import { required, helpers } from "@vuelidate/validators";
+import { getDatabase, ref, set } from "firebase/database";
+import firebase from "../../firebase";
 export default {
   name: "productCategoryUpdate",
   components: {
@@ -100,9 +114,10 @@ export default {
       selectedTags: [],
       alert: false,
       isActive: false,
+      imageUrl: "",
       loading: [],
       pageAction: this.categoryCheck(),
-      selectedTags: ["pizza"],
+      selectedTags: [],
       items: [
         "burger",
         "chicken",
@@ -113,37 +128,59 @@ export default {
         "seafood",
       ],
       rules: [
-        (value) => !!value || "Required.",
-        (value) => (value && value.length >= 3) || "Min 3 characters",
+        (value) => !!value || "",
+        (value) => (value && value.length >= 3) || "Minimun 3 characters",
+        (value) => (value && value.length <= 128) || "Maximum 128 characters",
       ],
       isActive: "Inactive",
     };
   },
   validations() {
     return {
-      categoryName: { required },
-      selectedTags: { required },
+      categoryName: {
+        required: helpers.withMessage("Category Name is Required!", required),
+        $autoDirty: true,
+      },
+      selectedTags: {
+        required: helpers.withMessage("Category Tag is Required!", required),
+        $autoDirty: true,
+      },
     };
   },
   methods: {
     load(i) {
       this.loading[i] = true;
-      // this.submitForm();
+      this.submitForm();
       setTimeout(() => (this.loading[i] = false), 3000);
     },
     async submitForm() {
-      const isFormCorrect = await this.v$.$validate();
+      this.v$.$touch();
 
       // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
       if (!this.v$.$error) {
         this.alert = true;
-      } else {
-        alert("Form Failed Validation.");
+        setTimeout(() => (this.alert = false), 3000);
+        // actually submit form
       }
-      // actually submit form
+    },
+    clearFields() {
+      this.categoryName = "";
+      this.selectedTags = [];
+      this.isActive = false;
     },
     categoryCheck() {
       return Number(this.$route.params.id) ? "Edit Category" : "Add Category";
+    },
+    getImage(imageName) {
+      this.imageUrl = `/images/${imageName}`;
+    },
+    //Database Operations
+    writeCategoryData(categoryId, name) {
+      const db = getDatabase();
+      set(ref(db, "users/" + categoryId), {
+        name: name,
+        image: this.imageUrl,
+      });
     },
   },
 };

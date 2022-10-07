@@ -1,9 +1,9 @@
 <template>
-    <section>
+  <section>
     <v-card class="mx-auto" height="150px" width="100%">
       <v-img
         cover
-        class="fill-height white--text "
+        class="fill-height white--text"
         lazy-src="../assets/menu.jpg"
         width="100%"
         src="../assets/menu.jpg"
@@ -25,15 +25,13 @@
 
 <script>
 export default {
-  props: ['titleName'],
+  props: ["titleName"],
   data() {
     return {
       title: "",
     };
   },
-}
+};
 </script>
 
-<style>
-
-</style>
+<style></style>
