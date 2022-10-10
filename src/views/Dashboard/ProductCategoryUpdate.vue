@@ -8,6 +8,9 @@
             <v-alert type="success" v-model="alert">
               {{ pageAction.split(" ").join("ed ") }} Sussessfully.
             </v-alert>
+            <v-alert type="warning" v-model="warnAlert">
+              Image is Required!
+            </v-alert>
             <div>
               <v-col class="text-right">
                 <v-btn
@@ -99,8 +102,8 @@ import Banner from "@/components/Banner.vue";
 import ImageOperation from "@/components/ImageOperation.vue";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
-import { getDatabase, ref, set } from "firebase/database";
-import firebase from "../../firebase";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "@/firebase";
 export default {
   name: "productCategoryUpdate",
   components: {
@@ -110,9 +113,11 @@ export default {
   data() {
     return {
       v$: useVuelidate(),
+      docId: "",
       categoryName: "",
       selectedTags: [],
       alert: false,
+      warnAlert: false,
       isActive: false,
       imageUrl: "",
       loading: [],
@@ -145,6 +150,10 @@ export default {
         required: helpers.withMessage("Category Tag is Required!", required),
         $autoDirty: true,
       },
+      imageUrl: {
+        required,
+        $autoDirty: true,
+      },
     };
   },
   methods: {
@@ -155,18 +164,23 @@ export default {
     },
     async submitForm() {
       this.v$.$touch();
-
+      if (this.imageUrl === "") {
+        this.warnAlert = true;
+        setTimeout(() => (this.warnAlert = false), 3000);
+      }
       // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
       if (!this.v$.$error) {
         this.alert = true;
         setTimeout(() => (this.alert = false), 3000);
         // actually submit form
+        this.writeCategoryData();
       }
     },
     clearFields() {
       this.categoryName = "";
       this.selectedTags = [];
       this.isActive = false;
+      this.isSubmit = true;
     },
     categoryCheck() {
       return Number(this.$route.params.id) ? "Edit Category" : "Add Category";
@@ -174,13 +188,37 @@ export default {
     getImage(imageName) {
       this.imageUrl = `/images/${imageName}`;
     },
+    getRandomId() {
+      const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let result = " ";
+      const charactersLength = characters.length;
+      for (let i = 0; i < 5; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * charactersLength)
+        );
+      }
+      return result;
+    },
     //Database Operations
-    writeCategoryData(categoryId, name) {
-      const db = getDatabase();
-      set(ref(db, "users/" + categoryId), {
-        name: name,
+    writeCategoryData() {
+      this.docId = "cat" + this.getRandomId().trim();
+      const category = {
+        active: Boolean(this.isActive),
         image: this.imageUrl,
-      });
+        name: this.categoryName,
+        tags: this.selectedTags,
+      };
+      const docRef = doc(db, "categories", this.docId);
+      setDoc(docRef, category)
+        .then(() => {
+          console.log("added data successfully. " + this.docId);
+          this.emitter.emit("formSubmit");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      this.clearFields();
     },
   },
 };

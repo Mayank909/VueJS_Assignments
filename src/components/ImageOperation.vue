@@ -50,17 +50,24 @@ import firebase from "../firebase";
 export default {
   data() {
     return {
-      isDisable: false,
-      userData: require("../assets/inst1.jpeg"),
+      isDisable: true,
+      userData: require("../assets/default.png"),
       defaultText: "Upload",
     };
+  },
+  mounted() {
+    this.emitter.on("formSubmit", (event) => {
+      this.clearImage();
+    });
+  },
+  unmounted() {
+    this.emitter.off("formSubmit");
   },
   methods: {
     msgUpdate() {
       //For Uploding the image to the servers
       const [imageUpload] = imgfile.files;
       const storage = getStorage();
-      //imageUpload.split('.');
       const imageRef = ref(storage, `images/${imageUpload.name}`);
       uploadBytes(imageRef, imageUpload).then(() => {
         alert("Image Uploaded");
@@ -69,8 +76,6 @@ export default {
     //For deletion on selected image
     deleteImage() {
       const [imageUpload] = imgfile.files;
-      this.userData = "";
-      this.isDisable = true;
       const storage = getStorage();
       // Create a reference to the file to delete
       const imageRef = ref(storage, `images/${imageUpload.name}`);
@@ -78,10 +83,15 @@ export default {
       deleteObject(imageRef)
         .then(() => {
           alert("Image is Deleted Successfully.");
+          this.clearImage();
         })
         .catch((error) => {
           console.log(error);
         });
+    },
+    clearImage() {
+      this.userData = require("../assets/default.png");
+      this.isDisable = true;
     },
     //For previewing the image file
     updateImg() {
