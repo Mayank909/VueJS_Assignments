@@ -101,9 +101,8 @@
 import Banner from "@/components/Banner.vue";
 import ImageOperation from "@/components/ImageOperation.vue";
 import useVuelidate from "@vuelidate/core";
-import { required, helpers } from "@vuelidate/validators";
-import { setDoc, doc } from "firebase/firestore";
-import { db } from "@/firebase";
+import { required, helpers, url } from "@vuelidate/validators";
+import Services from "@/helpers/api";
 export default {
   name: "productCategoryUpdate",
   components: {
@@ -119,7 +118,7 @@ export default {
       alert: false,
       warnAlert: false,
       isActive: false,
-      imageUrl: "",
+      imageUrl: null,
       loading: [],
       pageAction: this.categoryCheck(),
       selectedTags: [],
@@ -186,7 +185,7 @@ export default {
       return Number(this.$route.params.id) ? "Edit Category" : "Add Category";
     },
     getImage(imageName) {
-      this.imageUrl = `/images/${imageName}`;
+      this.imageUrl = `images/${imageName}`;
     },
     getRandomId() {
       const characters =
@@ -201,7 +200,7 @@ export default {
       return result;
     },
     //Database Operations
-    writeCategoryData() {
+    async writeCategoryData() {
       this.docId = "cat" + this.getRandomId().trim();
       const category = {
         active: Boolean(this.isActive),
@@ -209,10 +208,11 @@ export default {
         name: this.categoryName,
         tags: this.selectedTags,
       };
-      const docRef = doc(db, "categories", this.docId);
-      setDoc(docRef, category)
-        .then(() => {
-          console.log("added data successfully. " + this.docId);
+      const serviceApi = new Services();
+      await serviceApi
+        .post("categories", this.docId, category)
+        .then((res) => {
+          console.log("added data successfully. " + res);
           this.emitter.emit("formSubmit");
         })
         .catch((err) => {

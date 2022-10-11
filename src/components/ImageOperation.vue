@@ -69,9 +69,14 @@ export default {
       const [imageUpload] = imgfile.files;
       const storage = getStorage();
       const imageRef = ref(storage, `images/${imageUpload.name}`);
-      uploadBytes(imageRef, imageUpload).then(() => {
-        alert("Image Uploaded");
-      });
+      uploadBytes(imageRef, imageUpload)
+        .then((response) => {
+          //  $emit( 'selectedImage', response);
+          console.log(response);
+        })
+        .catch((err) => {
+          // $emit('selectedImage', response)
+        });
     },
     //For deletion on selected image
     deleteImage() {
@@ -98,6 +103,7 @@ export default {
       const [file] = imgfile.files;
       if (file) {
         this.userData = URL.createObjectURL(file);
+        console.log(this.userData);
         this.isDisable = false;
         this.msgUpdate();
       }

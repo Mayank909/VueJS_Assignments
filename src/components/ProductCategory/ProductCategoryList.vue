@@ -109,6 +109,7 @@
 </template>
 
 <script>
+import Services from "@/helpers/api";
 export default {
   data() {
     return {
@@ -172,89 +173,22 @@ export default {
   },
 
   methods: {
-    initialize() {
-      this.categories = [
-        {
-          id: 1,
-          name: "Pizza",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-        {
-          id: 2,
-          name: "Drinks",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-        {
-          id: 3,
-          name: "Main Dishes",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-        {
-          id: 4,
-          name: "seafood",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-        {
-          id: 5,
-          name: "Pizza",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-        {
-          id: 6,
-          name: "Pizza",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-        {
-          id: 7,
-          name: "Pizza",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-        {
-          id: 8,
-          name: "Pizza",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-        {
-          id: 9,
-          name: "Pizza",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-        {
-          id: 10,
-          name: "Pizza",
-          image: "#",
-          isActive: true,
-          tags: [],
-          descriptions: "",
-        },
-      ];
+    async initialize() {
+      const serviceApi = new Services();
+      await serviceApi.getAll().then((res) => {
+        res = JSON.parse(JSON.stringify(res));
+        let result = res.map((data) => {
+          console.log(data);
+          return {
+            id: data.id,
+            name: data.document.name,
+            image: data.document.image,
+            isActive: data.document.active,
+            tags: data.document.tags,
+          };
+        });
+        this.categories = result;
+      });
     },
 
     editItem(item = { id: 0 }) {
@@ -265,13 +199,15 @@ export default {
       this.$router.push({ name: "productCategoryUpdate", params: { id } });
     },
 
-    deleteItem(item) {
+     deleteItem(item) {
       this.editedIndex = this.categories.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
-    deleteItemConfirm() {
+   async deleteItemConfirm() {
+      const serviceApi = new Services();
+      await serviceApi.delete(item.id);
       this.categories.splice(this.editedIndex, 1);
       this.closeDelete();
     },
