@@ -8,7 +8,6 @@
           @change="updateImg"
           id="imgfile"
           name="file"
-          @input="$emit('selectedImage', userData.split(`/`)[2])"
         />
         <label for="file">
           <v-card
@@ -45,17 +44,22 @@
 </template>
 
 <script>
-import { ref, uploadBytes, getStorage, deleteObject } from "firebase/storage";
+import { ref, uploadBytes, getStorage,getDownloadURL, deleteObject } from "firebase/storage";
 import firebase from "../firebase";
+import Services from "@/helpers/api"
 export default {
   data() {
     return {
       isDisable: true,
       userData: require("../assets/default.png"),
       defaultText: "Upload",
+      imageurl: "",
     };
   },
   mounted() {
+    if(this.$route.params.id){
+      this.displayEditCategory();
+    }
     this.emitter.on("formSubmit", (event) => {
       this.clearImage();
     });
@@ -64,19 +68,20 @@ export default {
     this.emitter.off("formSubmit");
   },
   methods: {
-    msgUpdate() {
+    async msgUpdate() {
       //For Uploding the image to the servers
       const [imageUpload] = imgfile.files;
       const storage = getStorage();
       const imageRef = ref(storage, `images/${imageUpload.name}`);
-      uploadBytes(imageRef, imageUpload)
+     await uploadBytes(imageRef, imageUpload)
         .then((response) => {
-          //  $emit( 'selectedImage', response);
-          console.log(response.metadata.fullPath);
+          response = JSON.parse(JSON.stringify(response));
+          this.imageurl = response.metadata.fullPath;
         })
         .catch((err) => {
-          // $emit('selectedImage', response)
+          console.log( err)
         });
+        this.$emit( 'selectedImage', this.imageurl);
     },
     //For deletion on selected image
     deleteImage() {
@@ -98,14 +103,14 @@ export default {
     download() {
       // Create a reference to the file we want to download
       const storage = getStorage();
-      const [imageUpload] = imgfile.files;
-      const imgRef = ref(storage, `images/${imageUpload.name}`);
+      let file = this.imageurl.split("/"); 
+      const imgRef = ref(storage, `images/${file[1]}`);
       // Get the download URL
-      getDownloadURL(imgRef)
-        .then((url) => {
+     
+      getDownloadURL(imgRef).then((url) => {
           // Insert url into an <img> tag to "download
           // Or inserted into an <img> element
-          console.log(url);
+          this.userData = url;
         })
         .catch((error) => {
           // A full list of error codes is available at
@@ -135,11 +140,19 @@ export default {
       const [file] = imgfile.files;
       if (file) {
         this.userData = URL.createObjectURL(file);
-        console.log(this.userData);
         this.isDisable = false;
         this.msgUpdate();
       }
     },
+     async displayEditCategory(){
+    const serviceApi = new Services();
+      await serviceApi.get("categories", this.$route.params.id).then((res)=>{
+         res = JSON.parse(JSON.stringify(res));
+         this.imageurl = String(res.image);
+         console.log(this.imageurl)
+      });
+      this.download();
+  },
     imageUploader() {
       imgfile.click();
     },

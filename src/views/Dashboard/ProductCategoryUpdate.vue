@@ -30,7 +30,7 @@
           </v-col>
           <v-col cols="12" md="6">
             <h3 class="mt-2 mb-3">Image Upload</h3>
-            <ImageOperation @selectedImage="getImage" />
+            <ImageOperation  @selectedImage="getImage" />
           </v-col>
           <v-col cols="12" md="6">
             <v-card class="mt-3">
@@ -187,7 +187,7 @@ export default {
       return (this.$route.params.id) === "0" ? "Add Category" : "Edit Category";
     },
     getImage(imageName) {
-      this.imageUrl = `images/${imageName}`;
+      this.imageUrl = imageName;
     },
     getRandomId() {
       const characters =
