@@ -155,7 +155,7 @@ export default {
   },
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+      return "New Item" 
     },
   },
 
@@ -175,10 +175,9 @@ export default {
   methods: {
     async initialize() {
       const serviceApi = new Services();
-      await serviceApi.getAll().then((res) => {
+      await serviceApi.getAll("categories").then((res) => {
         res = JSON.parse(JSON.stringify(res));
         let result = res.map((data) => {
-          console.log(data);
           return {
             id: data.id,
             name: data.document.name,
@@ -200,15 +199,15 @@ export default {
     },
 
      deleteItem(item) {
-      this.editedIndex = this.categories.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+      this.editedItem = this.categories.find((element)=> element.id === item.id
+    );
       this.dialogDelete = true;
     },
 
    async deleteItemConfirm() {
       const serviceApi = new Services();
-      await serviceApi.delete(item.id);
-      this.categories.splice(this.editedIndex, 1);
+      await serviceApi.delete("collections", this.editedItem.id);
+      this.categories.splice(this.editedItem, 1);
       this.closeDelete();
     },
 

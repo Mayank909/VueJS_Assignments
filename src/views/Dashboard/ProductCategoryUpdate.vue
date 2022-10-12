@@ -82,9 +82,7 @@
                       class="ma-2"
                       color="primary"
                       inset
-                      true-value="Active"
-                      false-value="Inactive"
-                      :label="isActive"
+                      :label="isActive ? 'Active' : 'Inactive'"
                     ></v-switch>
                   </v-col>
                 </v-row>
@@ -136,7 +134,6 @@ export default {
         (value) => (value && value.length >= 3) || "Minimun 3 characters",
         (value) => (value && value.length <= 128) || "Maximum 128 characters",
       ],
-      isActive: "Inactive",
     };
   },
   validations() {
@@ -155,6 +152,11 @@ export default {
       },
     };
   },
+  mounted(){
+    if(this.pageAction === "Edit Category"){
+      this.displayEditCategory();
+    }
+  },
   methods: {
     load(i) {
       this.loading[i] = true;
@@ -172,7 +174,7 @@ export default {
         this.alert = true;
         setTimeout(() => (this.alert = false), 3000);
         // actually submit form
-        this.writeCategoryData();
+        (this.pageAction === "Add Category") ? this.writeCategoryData() : this.editCategory();
       }
     },
     clearFields() {
@@ -182,7 +184,7 @@ export default {
       this.isSubmit = true;
     },
     categoryCheck() {
-      return Number(this.$route.params.id) ? "Edit Category" : "Add Category";
+      return (this.$route.params.id) === "0" ? "Add Category" : "Edit Category";
     },
     getImage(imageName) {
       this.imageUrl = `images/${imageName}`;
@@ -220,7 +222,35 @@ export default {
         });
       this.clearFields();
     },
+    async displayEditCategory(){
+      let id = this.$route.params.id;
+    const serviceApi = new Services();
+      await serviceApi.get("categories",id).then((res)=>{
+         res = JSON.parse(JSON.stringify(res));
+        this.isActive = Boolean(res.active);
+         this.imageUrl = res.image;
+        this.categoryName = res.name;
+        this.selectedTags = res.tags;
+      });
   },
+  async editCategory(){
+       const category = {
+        active: this.isActive,
+        image: this.imageUrl,
+        name: this.categoryName,
+        tags: this.selectedTags,
+      };
+      let id = this.$route.params.id;
+    const serviceApi = new Services();
+      await serviceApi.put("categories", id, category).then((res)=>{
+        console.log(res);
+      }).catch(err =>{
+        console.log(error);
+      });
+    this.$router.push("/category");
+  },
+  },
+  
 };
 </script>
 

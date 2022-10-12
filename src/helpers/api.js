@@ -6,10 +6,10 @@ export default class Services {
     const docRef = doc(db, collectionName, id);
     setDoc(docRef, payload);
   }
-  async getAll() {
+  async getAll(collectionName) {
     const dataArray = [];
     await db
-      .collection("categories")
+      .collection(collectionName)
       .get()
       .then((snapshot) => {
         snapshot.docs.forEach((doc) => {
@@ -18,7 +18,20 @@ export default class Services {
       });
     return dataArray;
   }
-  async delete(id) {
-    await db.collection("categories").doc(id).delete();
+  async get(collectionName, id) {
+    let data;
+    await db
+      .collection(collectionName).doc(id)
+      .get()
+      .then((snapshot) => {
+        data = snapshot.data();
+      });
+   return data;
+  }
+  async delete(collectionName,id) {
+    await db.collection(collectionName).doc(id).delete();
+  }
+  async put(collectionName,id, payload) {
+    await db.collection(collectionName).doc(id).update(payload);
   }
 }
