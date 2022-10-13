@@ -36,7 +36,20 @@
           size="35"
           color="secondary"
         >
+        
           <v-icon dark size="20">mdi-delete</v-icon>
+        </v-btn>
+        <v-btn
+          v-if="isEdited"
+          class="image-remove ma-2"
+          x-small
+          fab
+          @click="imageUploader"
+          size="35"
+          color="secondary"
+        >
+        
+          <v-icon dark size="20">mdi-pencil</v-icon>
         </v-btn>
       </div>
     </form>
@@ -51,13 +64,15 @@ export default {
   data() {
     return {
       isDisable: true,
+      isEdited: false,
       userData: require("../assets/default.png"),
       defaultText: "Upload",
       imageurl: "",
     };
   },
   mounted() {
-    if(this.$route.params.id){
+    if(!this.$route.params.id == "0"){
+      this.isEdited= true;
       this.displayEditCategory();
     }
     this.emitter.on("formSubmit", (event) => {
@@ -71,8 +86,9 @@ export default {
     async msgUpdate() {
       //For Uploding the image to the servers
       const [imageUpload] = imgfile.files;
+      let fileImage = imageUpload.name.split(".");
       const storage = getStorage();
-      const imageRef = ref(storage, `images/${imageUpload.name}`);
+      const imageRef = ref(storage, `images/${fileImage[0]}${String(Math.floor(Math.random() * 100) + 1)}.${fileImage[1]}`);
      await uploadBytes(imageRef, imageUpload)
         .then((response) => {
           response = JSON.parse(JSON.stringify(response));
@@ -149,7 +165,9 @@ export default {
       await serviceApi.get("categories", this.$route.params.id).then((res)=>{
          res = JSON.parse(JSON.stringify(res));
          this.imageurl = String(res.image);
-         console.log(this.imageurl)
+         
+      }).catch((err)=>{
+        console.log("error: " + err);
       });
       this.download();
   },

@@ -1,13 +1,395 @@
 <template>
-  
+  <v-card>
+    <Banner :titleName="pageAction" />
+    <v-card-text>
+      <v-container color="primary">
+        <v-row no-gutters justify="end">
+          <v-col cols="12">
+            <v-alert type="success" v-model="alert">
+              {{ pageAction.split(" ").join("ed ") }} Sussessfully.
+            </v-alert>
+            <v-alert type="warning" v-model="warnAlert">
+              Image is Required!
+            </v-alert>
+            <div>
+              <v-col class="text-right">
+                <v-btn
+                  :loading="loading[1]"
+                  :disabled="loading[1]"
+                  class="ma-2"
+                  color="primary"
+                  @click="load(1)"
+                >
+                  {{ pageAction }}
+                </v-btn>
+                <v-btn class="ma-2" color="primary" @click="clearFields">
+                  Cancel
+                </v-btn>
+              </v-col>
+            </div>
+          </v-col>
+          <v-col cols="12" md="6">
+            <h3 class="mt-2 mb-3">Image Upload</h3>
+            <ImageOperation  @selectedImage="getImage" />
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-card class="mt-3">
+              <form action="" method="post">
+                <v-row class="pa-2">
+                  <v-col cols="12" md="12">
+                    <v-text-field
+                      label="Product Name"
+                      :rules="rules"
+                      hide-details="auto"
+                      color="primary"
+                      class="ma-2 mt-4"
+                      v-model="productName"
+                      :error="v$.productName.$error"
+                    ></v-text-field>
+                    <p
+                      style="color: #b00a20"
+                      class="mr-2 ml-2 text-caption"
+                      v-for="error of v$.productName.$errors"
+                      :key="error.$uid"
+                    >
+                      {{ error.$message }}
+                    </p>
+                  </v-col>
+                  <v-col cols="12" md="12">
+                    <v-text-field
+                      label="Product Price"
+                      :rules="rules"
+                      hide-details="auto"
+                      type="number"
+                      color="primary"
+                      class="ma-2 mt-4"
+                      v-model.number="productPrice"
+                      :error="v$.productPrice.$error"
+                    ></v-text-field>
+                    <p
+                      style="color: #b00a20"
+                      class="mr-2 ml-2 text-caption"
+                      v-for="error of v$.productPrice.$errors"
+                      :key="error.$uid"
+                    >
+                      {{ error.$message }}
+                    </p>
+                  </v-col>
+                  <v-col cols="12" md="12">
+                    <v-text-field
+                      label="Discount Price"
+                      :rules="rules"
+                      hide-details="auto"
+                      type="number"
+                      color="primary"
+                      class="ma-2 mt-4"
+                      v-model.number="discountPrice"
+                      :error="v$.discountPrice.$error"
+                    ></v-text-field>
+                    <p
+                      style="color: #b00a20"
+                      class="mr-2 ml-2 text-caption"
+                      v-for="error of v$.discountPrice.$errors"
+                      :key="error.$uid"
+                    >
+                      {{ error.$message }}
+                    </p>
+                  </v-col>
+                  <v-col cols="12" md="12">
+                    <v-textarea
+                      label="Product Detail"
+                      auto-grow
+                      :rules="textRule"
+                      filled
+                      rows="1"
+                      hide-details="auto"
+                      color="primary"
+                      class="ma-2 mt-4"
+                      v-model="productDetail"
+                      :error="v$.productDetail.$error"
+                    ></v-textarea>
+                    <p
+                      style="color: #b00a20"
+                      class="mr-2 ml-2 text-caption"
+                      v-for="error of v$.productDetail.$errors"
+                      :key="error.$uid"
+                    >
+                      {{ error.$message }}
+                    </p>
+                  </v-col>
+                  <v-col cols="12" md="12">
+                    <v-textarea
+                      label="Product Description"
+                      auto-grow
+                      :rules="textRule"
+                      filled
+                      rows="1"
+                      hide-details="auto"
+                      color="primary"
+                      class="ma-2 mt-4"
+                      v-model="productDescription"
+                      :error="v$.productDescription.$error"
+                    ></v-textarea>
+                    <p
+                      style="color: #b00a20"
+                      class="mr-2 ml-2 text-caption"
+                      v-for="error of v$.productDetail.$errors"
+                      :key="error.$uid"
+                    >
+                      {{ error.$message }}
+                    </p>
+                  </v-col>
+                  <v-col cols="12" md="12">
+                    <v-select
+                      label="Select Category"
+                      hide-details="auto"
+                      :items="categories"
+                      menu-props="auto"
+                      single-line
+                      color="primary"
+                      class="ma-2 mt-4"
+                      v-model="selectedCategory"
+                      :error="v$.selectedCategory.$error"
+                    ></v-select>
+                    <p
+                      style="color: #b00a20"
+                      class="mr-2 ml-2 text-caption"
+                      v-for="error of v$.selectedCategory.$errors"
+                      :key="error.$uid"
+                    >
+                      {{ error.$message }}
+                    </p>
+                  </v-col>
+                  <v-col cols="12" md="12">
+                    <v-combobox
+                      class="ma-2 mt-4"
+                      v-model="selectedTags"
+                      :items="items"
+                      label="Tags"
+                      color="primary"
+                      :error="v$.selectedTags.$error"
+                      multiple
+                      chips
+                    ></v-combobox>
+                    <p
+                      style="color: #b00a20"
+                      class="mr-2 ml-2 text-caption"
+                      :class="error.$color"
+                      v-for="error of v$.selectedTags.$errors"
+                      :key="error.$uid"
+                    >
+                      {{ error.$message }}
+                    </p>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-switch
+                      v-model="isActive"
+                      class="ma-2"
+                      color="primary"
+                      inset
+                      :label="isActive ? 'Active' : 'Inactive'"
+                    ></v-switch>
+                  </v-col>
+                </v-row>
+              </form>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
+import Banner from "@/components/Banner.vue";
+import ImageOperation from "@/components/ImageOperation.vue";
+import useVuelidate from "@vuelidate/core";
+import { required, helpers, url } from "@vuelidate/validators";
+import Services from "@/helpers/api";
 export default {
-
-}
+  name: "productUpdate",
+  components: {
+    Banner,
+    ImageOperation,
+  },
+  data() {
+    return {
+      v$: useVuelidate(),
+      docId: "",
+      productName: "",
+      productPrice: 0,
+      discountPrice: 0,
+      productDetail: "",
+      productDescription: "",
+      category: "",
+      selectedTags: [],
+      alert: false,
+      warnAlert: false,
+      isActive: false,
+      imageUrl: null,
+      loading: [],
+      pageAction: this.productCheck(),
+      selectedTags: [],
+      items: [
+        "burger",
+        "chicken",
+        "dishes",
+        "italian",
+        "menu",
+        "pizza",
+        "seafood",
+      ],
+      selectedCategory: null,
+      categories: [
+          'drinks', 'sweets', 'Pizza', 'Coffee'],
+      rules: [
+        (value) => !!value || "",
+        (value) => (value && value.length >= 3) || "Minimun 3 characters",
+        (value) => (value && value.length <= 128) || "Maximum 128 characters",
+      ],
+      textRule: [
+        (value) => !!value || "",
+        (value) => (value && value.length >= 3) || "Minimun 3 characters",
+        (value) => (value && value.length <= 255) || "Maximum 128 characters",
+      ],
+    };
+  },
+  validations() {
+    return {
+      productName: {
+        required: helpers.withMessage("Product Name is Required!", required),
+        $autoDirty: true,
+      },
+      selectedTags: {
+        required: helpers.withMessage("Product Tag is Required!", required),
+        $autoDirty: true,
+      },
+      productPrice: {
+        required: helpers.withMessage("Product Price is Required!", required),
+        $autoDirty: true,
+      },
+      discountPrice: {
+        required: helpers.withMessage("Product Discount Price is Required!", required),
+        $autoDirty: true,
+      },
+      productDetail: {
+        required: helpers.withMessage("Product Detail is Required!", required),
+        $autoDirty: true,
+      },
+      productDescription: {
+        required: helpers.withMessage("Product Description is Required!", required),
+        $autoDirty: true,
+      },
+      selectedCategory: {
+        required: helpers.withMessage("Product Category is Required!", required),
+        $autoDirty: true,
+      },
+      imageUrl: {
+        required,
+        $autoDirty: true,
+      },
+    };
+  },
+  mounted(){
+    if(this.pageAction === "Edit Product"){
+      this.displayEditproduct();
+    }
+  },
+  methods: {
+    load(i) {
+      this.loading[i] = true;
+      this.submitForm();
+      setTimeout(() => (this.loading[i] = false), 3000);
+    },
+    async submitForm() {
+      this.v$.$touch();
+      if (this.imageUrl === "") {
+        this.warnAlert = true;
+        setTimeout(() => (this.warnAlert = false), 3000);
+      }
+      // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
+      if (!this.v$.$error) {
+        this.alert = true;
+        setTimeout(() => (this.alert = false), 3000);
+        // actually submit form
+        (this.pageAction === "Add Product") ? this.writeProductData() : this.editProduct();
+      }
+    },
+    clearFields() {
+      this.productName = "";
+      this.selectedTags = [];
+      this.isActive = false;
+      this.isSubmit = true;
+    },
+    productCheck() {
+      return (this.$route.params.id) === "0" ? "Add Product" : "Edit Product";
+    },
+    getImage(imageName) {
+      this.imageUrl = imageName;
+    },
+    getRandomId() {
+      const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let result = " ";
+      const charactersLength = characters.length;
+      for (let i = 0; i < 5; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * charactersLength)
+        );
+      }
+      return result;
+    },
+    //Database Operations
+    async writeProductData() {
+      this.docId = "cat" + this.getRandomId().trim();
+      const product= {
+        active: Boolean(this.isActive),
+        image: this.imageUrl,
+        name: this.productName,
+        tags: this.selectedTags,
+      };
+      const serviceApi = new Services();
+      await serviceApi
+        .post("products", this.docId, product)
+        .then((res) => {
+          console.log("added data successfully. " + res);
+          this.emitter.emit("formSubmit");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      this.clearFields();
+    },
+    async displayEditProduct(){
+      let id = this.$route.params.id;
+    const serviceApi = new Services();
+      await serviceApi.get("products",id).then((res)=>{
+         res = JSON.parse(JSON.stringify(res));
+        this.isActive = Boolean(res.active);
+         this.imageUrl = res.image;
+        this.productName = res.name;
+        this.selectedTags = res.tags;
+      });
+  },
+  async editProduct(){
+       const product= {
+        active: this.isActive,
+        image: this.imageUrl,
+        name: this.productName,
+        tags: this.selectedTags,
+      };
+      let id = this.$route.params.id;
+    const serviceApi = new Services();
+      await serviceApi.put("products", id, product).then((res)=>{
+        console.log(res);
+      }).catch(err =>{
+        console.log(error);
+      });
+    this.$router.push("/product");
+  },
+  },
+  
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

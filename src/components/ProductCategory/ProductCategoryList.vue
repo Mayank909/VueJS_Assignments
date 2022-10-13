@@ -34,7 +34,9 @@
             <td>{{ item.id }}</td>
             <td>{{ item.name }}</td>
             <td>
-             {{ item.image}}
+              <v-avatar>
+                <v-img width="300" :src="item.image" alt="your image"> </v-img>
+              </v-avatar>
             </td>
             <td>{{ item.tags }}</td>
             <td>{{ item.isActive ? "YES" : "NO" }}</td>
@@ -111,7 +113,13 @@
 </template>
 
 <script>
-import { ref, uploadBytes, getStorage,getDownloadURL, deleteObject } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getStorage,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import firebase from "@/firebase";
 import Services from "@/helpers/api";
 export default {
@@ -159,7 +167,7 @@ export default {
   },
   computed: {
     formTitle() {
-      return "New Item" 
+      return "New Item";
     },
   },
 
@@ -192,9 +200,7 @@ export default {
         });
         this.categories = result;
       });
-      // this.categories.forEach((element)=>{
-      //   element.image = this.download(element.image)
-      // });
+      this.download();
     },
 
     editItem(item = { id: 0 }) {
@@ -202,16 +208,17 @@ export default {
       // this.editedItem = Object.assign({}, item);
       // this.dialog = true;
       let id = item.id;
-      this.$router.push({ name: "productCategoryUpdate", params: { id } });
+      this.$router.push({ name: "product_category_update", params: { id } });
     },
 
-     deleteItem(item) {
-      this.editedItem = this.categories.find((element)=> element.id === item.id
-    );
+    deleteItem(item) {
+      this.editedItem = this.categories.find(
+        (element) => element.id === item.id
+      );
       this.dialogDelete = true;
     },
 
-   async deleteItemConfirm() {
+    async deleteItemConfirm() {
       const serviceApi = new Services();
       await serviceApi.delete("categories", this.editedItem.id);
       this.categories.splice(this.editedItem, 1);
@@ -233,7 +240,7 @@ export default {
         this.editedIndex = -1;
       });
     },
-    
+
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.categories[this.editedIndex], this.editedItem);
@@ -242,37 +249,39 @@ export default {
       }
       this.close();
     },
-    download(img) {
+    download() {
       // Create a reference to the file we want to download
       const storage = getStorage();
-      let file = img.split("/"); 
-      console.log(file)
-      const imgRef = ref(storage, `images/${file[1]}`);
-      // Get the download URL
-     
-      getDownloadURL(imgRef).then((url) => {
-          // Insert url into an <img> tag to "download
-          // Or inserted into an <img> element
-          return url;
-        })
-        .catch((error) => {
-          // A full list of error codes is available at
-          // https://firebase.google.com/docs/storage/web/handle-errors
-          switch (error.code) {
-            case "storage/object-not-found":
-              alert("File doesn't exist");
-              break;
-            case "storage/unauthorized":
-              alert("User doesn't have permission to access the object");
-              break;
-            case "storage/canceled":
-              alert("User canceled the upload");
-              break;
-            case "storage/unknown":
-              alert("Unknown error occurred, inspect the server response");
-              break;
-          }
-        });
+      for (const element of this.categories) {
+        let file = element.image.split("/");
+        const imgRef = ref(storage, `images/${file[1]}`);
+        // Get the download URL
+
+        getDownloadURL(imgRef)
+          .then((url) => {
+            // Insert url into an <img> tag to "download
+            // Or inserted into an <img> element
+            element.image = url;
+          })
+          .catch((error) => {
+            // A full list of error codes is available at
+            // https://firebase.google.com/docs/storage/web/handle-errors
+            switch (error.code) {
+              case "storage/object-not-found":
+                alert("File doesn't exist");
+                break;
+              case "storage/unauthorized":
+                alert("User doesn't have permission to access the object");
+                break;
+              case "storage/canceled":
+                alert("User canceled the upload");
+                break;
+              case "storage/unknown":
+                alert("Unknown error occurred, inspect the server response");
+                break;
+            }
+          });
+      }
     },
   },
 };
