@@ -30,7 +30,7 @@
           </v-col>
           <v-col cols="12" md="6">
             <h3 class="mt-2 mb-3">Image Upload</h3>
-            <ImageOperation @selectedImage="getImage" />
+            <ImageOperation :pageName="collection" @selectedImage="getImage" />
             <p
               style="color: #b00a20"
               class="mr-2 mt-2 text-caption"
@@ -229,6 +229,7 @@ export default {
       productDetail: "",
       productDescription: "",
       selectedTags: [],
+      collection: "products",
       alert: false,
       warnAlert: false,
       isActive: false,

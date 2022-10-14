@@ -34,8 +34,8 @@
             <td>{{ item.id }}</td>
             <td>{{ item.name }}</td>
             <td>
-              <v-avatar>
-                <v-img width="300" :src="item.image" alt="your image"> </v-img>
+              <v-avatar v-if="item.downloadImage">
+                <v-img width="300" :src="item.downloadImage" alt="your image"> </v-img>
               </v-avatar>
             </td>
             <td>{{ item.price }}</td>
@@ -152,7 +152,7 @@ export default {
   },
 
   created() {
-    // this.initialize();
+     this.initialize();
   },
 
   methods: {
@@ -235,7 +235,7 @@ export default {
           .then((url) => {
             // Insert url into an <img> tag to "download
             // Or inserted into an <img> element
-            element.image = url;
+            element["downloadImage"] = url;
           })
           .catch((error) => {
             // A full list of error codes is available at

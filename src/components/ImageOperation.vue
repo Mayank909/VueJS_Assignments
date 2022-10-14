@@ -61,6 +61,7 @@ import { ref, uploadBytes, getStorage,getDownloadURL, deleteObject } from "fireb
 import firebase from "../firebase";
 import Services from "@/helpers/api"
 export default {
+  props: { pageName: { type: String, required: true }},
   data() {
     return {
       isDisable: true,
@@ -71,9 +72,9 @@ export default {
     };
   },
   mounted() {
-    if(!(this.$route.params.id === "0")){
+      if(!(this.$route.params.id === "0")){
       this.isEdited= true;
-      this.displayEditCategory();
+      this.displayEdit(this.pageName);
     }
     this.emitter.on("formSubmit", (event) => {
       this.clearImage();
@@ -160,9 +161,9 @@ export default {
         this.msgUpdate();
       }
     },
-     async displayEditCategory(){
+     async displayEdit(collection){
     const serviceApi = new Services();
-      await serviceApi.get("categories", this.$route.params.id).then((res)=>{
+      await serviceApi.get(collection, this.$route.params.id).then((res)=>{
          res = JSON.parse(JSON.stringify(res));
          this.imageurl = String(res.image);
          
