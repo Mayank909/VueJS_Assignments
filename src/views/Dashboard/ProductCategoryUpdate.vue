@@ -8,9 +8,6 @@
             <v-alert type="success" v-model="alert">
               {{ pageAction.split(" ").join("ed ") }} Sussessfully.
             </v-alert>
-            <v-alert type="warning" v-model="warnAlert">
-              Image is Required!
-            </v-alert>
             <div>
               <v-col class="text-right">
                 <v-btn
@@ -23,14 +20,22 @@
                   {{ pageAction }}
                 </v-btn>
                 <v-btn class="ma-2" color="primary" @click="clearFields">
-                  Cancel
+                  Reset
                 </v-btn>
               </v-col>
             </div>
           </v-col>
           <v-col cols="12" md="6">
             <h3 class="mt-2 mb-3">Image Upload</h3>
-            <ImageOperation  @selectedImage="getImage" />
+            <ImageOperation @selectedImage="getImage" />
+            <p
+              style="color: #b00a20"
+              class="mr-2 mt-2 text-caption"
+              v-for="error of v$.imageUrl.$errors"
+              :key="error.$uid"
+            >
+              {{ error.$message }}
+            </p>
           </v-col>
           <v-col cols="12" md="6">
             <v-card class="mt-3">
@@ -60,6 +65,7 @@
                       class="ma-2 mt-4"
                       v-model="selectedTags"
                       :items="items"
+                      hide-details
                       label="Tags"
                       color="primary"
                       :error="v$.selectedTags.$error"
@@ -116,7 +122,7 @@ export default {
       alert: false,
       warnAlert: false,
       isActive: false,
-      imageUrl: null,
+      imageUrl: "",
       loading: [],
       pageAction: this.categoryCheck(),
       selectedTags: [],
@@ -147,13 +153,13 @@ export default {
         $autoDirty: true,
       },
       imageUrl: {
-        required,
+        required: helpers.withMessage("Image is Required!", required),
         $autoDirty: true,
       },
     };
   },
-  mounted(){
-    if(this.pageAction === "Edit Category"){
+  mounted() {
+    if (this.pageAction === "Edit Category") {
       this.displayEditCategory();
     }
   },
@@ -165,26 +171,25 @@ export default {
     },
     async submitForm() {
       this.v$.$touch();
-      if (this.imageUrl === "") {
-        this.warnAlert = true;
-        setTimeout(() => (this.warnAlert = false), 3000);
-      }
       // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
       if (!this.v$.$error) {
         this.alert = true;
         setTimeout(() => (this.alert = false), 3000);
         // actually submit form
-        (this.pageAction === "Add Category") ? this.writeCategoryData() : this.editCategory();
+        this.pageAction === "Add Category"
+          ? this.writeCategoryData()
+          : this.editCategory();
       }
     },
     clearFields() {
       this.categoryName = "";
       this.selectedTags = [];
       this.isActive = false;
-      this.isSubmit = true;
+      this.emitter.emit("formSubmit");
+      this.v$.$reset();
     },
     categoryCheck() {
-      return (this.$route.params.id) === "0" ? "Add Category" : "Edit Category";
+      return this.$route.params.id === "0" ? "Add Category" : "Edit Category";
     },
     getImage(imageName) {
       this.imageUrl = imageName;
@@ -222,35 +227,37 @@ export default {
         });
       this.clearFields();
     },
-    async displayEditCategory(){
+    async displayEditCategory() {
       let id = this.$route.params.id;
-    const serviceApi = new Services();
-      await serviceApi.get("categories",id).then((res)=>{
-         res = JSON.parse(JSON.stringify(res));
+      const serviceApi = new Services();
+      await serviceApi.get("categories", id).then((res) => {
+        res = JSON.parse(JSON.stringify(res));
         this.isActive = Boolean(res.active);
-         this.imageUrl = res.image;
+        this.imageUrl = res.image;
         this.categoryName = res.name;
         this.selectedTags = res.tags;
       });
-  },
-  async editCategory(){
-       const category = {
+    },
+    async editCategory() {
+      const category = {
         active: this.isActive,
         image: this.imageUrl,
         name: this.categoryName,
         tags: this.selectedTags,
       };
       let id = this.$route.params.id;
-    const serviceApi = new Services();
-      await serviceApi.put("categories", id, category).then((res)=>{
-        console.log(res);
-      }).catch(err =>{
-        console.log(error);
-      });
-    this.$router.push("/category");
+      const serviceApi = new Services();
+      await serviceApi
+        .put("categories", id, category)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(error);
+        });
+      this.$router.push("/category");
+    },
   },
-  },
-  
 };
 </script>
 

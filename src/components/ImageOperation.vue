@@ -71,7 +71,7 @@ export default {
     };
   },
   mounted() {
-    if(!this.$route.params.id == "0"){
+    if(!(this.$route.params.id === "0")){
       this.isEdited= true;
       this.displayEditCategory();
     }

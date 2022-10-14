@@ -17,7 +17,7 @@
 
           <v-spacer></v-spacer>
           <v-btn color="primary" dark class="mb-2" @click="editItem()">
-            New Item
+            New Product
           </v-btn>
         </div>
       </v-card-title>
@@ -52,47 +52,6 @@
           </tr>
         </tbody>
         <template v-slot:top>
-          <v-dialog v-model="dialog" color="secondary" max-width="500px">
-            <!-- Running... Code -->
-            <v-card>
-              <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
-              </v-card-title>
-
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.name"
-                        label="Catagory name"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.image"
-                        label="Image"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.active"
-                        label="Active"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">
-                  Cancel
-                </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
           <v-dialog v-model="dialogDelete" max-width="500px">
             <v-card class="pl-3 pr-3 pb-3 pt-4">
               <v-card-title class="text-h5 pa-2"
@@ -150,7 +109,7 @@ export default {
         { text: "Category", value: "category", sortable: false },
         { text: "Tags", value: "tags", sortable: false },
       ],
-      Products: [],
+      products: [],
       editedIndex: -1,
       editedItem: {
         id: 0,
@@ -182,11 +141,6 @@ export default {
       dialogDelete: false,
     };
   },
-  computed: {
-    formTitle() {
-      return "New Item";
-    },
-  },
 
   watch: {
     dialog(val) {
@@ -198,7 +152,7 @@ export default {
   },
 
   created() {
-    this.initialize();
+    // this.initialize();
   },
 
   methods: {
