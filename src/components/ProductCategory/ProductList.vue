@@ -35,16 +35,24 @@
             <td>{{ item.name }}</td>
             <td>
               <v-avatar v-if="item.downloadImage">
-                <v-img width="300" :src="item.downloadImage" alt="your image"> </v-img>
+                <v-img width="300" :src="item.downloadImage" alt="your image">
+                </v-img>
               </v-avatar>
             </td>
-            <td>{{ item.price }}</td>
-            <td>{{ item.discount_price }}</td>
-            <td>{{ item.detail }}</td>
-            <td>{{ item.description }}</td>
+            <td>{{ "₹" + item.price }}</td>
+            <td>{{ "₹" + item.discount_price }}</td>
             <td>{{ item.availability ? "YES" : "NO" }}</td>
             <td>{{ item.category }}</td>
-            <td>{{ item.tags }}</td>
+            <td>
+              <v-chip
+                v-for="tag in item.tags"
+                :key="tag"
+                color="primary"
+                class="ma-2"
+              >
+                {{ tag }}
+              </v-chip>
+            </td>
             <td>
               <v-icon small @click="editItem(item)">mdi-pencil</v-icon>
               <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
@@ -103,11 +111,10 @@ export default {
         { text: "Image", value: "image" },
         { text: "Price", value: "price", sortable: false },
         { text: "Discount_price", value: "discount_price" },
-        { text: "Detail", value: "detail", sortable: false },
-        { text: "Description", value: "description", sortable: false },
         { text: "Availability", value: "availability", sortable: false },
         { text: "Category", value: "category", sortable: false },
         { text: "Tags", value: "tags", sortable: false },
+        { text: "Actions", value: "actions", sortable: false },
       ],
       products: [],
       editedIndex: -1,
@@ -152,7 +159,7 @@ export default {
   },
 
   created() {
-     this.initialize();
+    this.initialize();
   },
 
   methods: {
@@ -180,9 +187,6 @@ export default {
     },
 
     editItem(item = { id: 0 }) {
-      // this.editedIndex = this.products.indexOf(item);
-      // this.editedItem = Object.assign({}, item);
-      // this.dialog = true;
       let id = item.id;
       this.$router.push({ name: "product_update", params: { id } });
     },
@@ -193,10 +197,10 @@ export default {
     },
 
     async deleteItemConfirm() {
+      this.products.splice(this.categories.indexOf(this.editedItem), 1);
+      this.closeDelete();
       const serviceApi = new Services();
       await serviceApi.delete("products", this.editedItem.id);
-      this.products.splice(this.editedItem, 1);
-      this.closeDelete();
     },
 
     close() {

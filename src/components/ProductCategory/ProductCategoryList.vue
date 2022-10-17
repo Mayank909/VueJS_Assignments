@@ -168,9 +168,6 @@ export default {
     },
 
     editItem(item = { id: 0 }) {
-      // this.editedIndex = this.categories.indexOf(item);
-      // this.editedItem = Object.assign({}, item);
-      // this.dialog = true;
       let id = item.id;
       this.$router.push({ name: "product_category_update", params: { id } });
     },
@@ -183,10 +180,10 @@ export default {
     },
 
     async deleteItemConfirm() {
+      this.categories.splice(this.categories.indexOf(this.editedItem), 1);
+      this.closeDelete();
       const serviceApi = new Services();
       await serviceApi.delete("categories", this.editedItem.id);
-      this.categories.splice(this.editedItem, 1);
-      this.closeDelete();
     },
 
     close() {
