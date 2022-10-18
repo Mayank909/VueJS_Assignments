@@ -5,15 +5,7 @@
         <v-spacer></v-spacer>
 
         <div color="surface" class="d-flex justify-space-around mt-4 mb-4">
-          <v-text-field
-            v-model="search"
-            append-inner-icon="mdi-magnify"
-            density="compact"
-            variant="outlined"
-            label="Search Category"
-            single-line
-            hide-details
-          ></v-text-field>
+          <Search @searchQuery="(value)=>{this.search = value;}" />
 
           <v-spacer></v-spacer>
           <v-btn color="primary" dark class="mb-2" @click="editItem()">
@@ -30,7 +22,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in products" :key="item.name">
+          <tr v-for="item in filterProducts" :key="item.name">
             <td>{{ item.id }}</td>
             <td>{{ item.name }}</td>
             <td>
@@ -80,14 +72,15 @@ import {
 import firebase from "@/firebase";
 import Services from "@/helpers/api";
 import { defineAsyncComponent } from "vue";
+import  Search  from "@/components/Search.vue"
 export default {
   components: {
     DeleteDialog: defineAsyncComponent(() => import("../DeleteDialog.vue")),
+    Search,
   },
   data() {
     return {
       search: "",
-      dialog: false,
       dialogDelete: false,
       headers: [
         {
@@ -133,11 +126,14 @@ export default {
       },
       loading: false,
       loaded: false,
-      dialog: false,
       dialogDelete: false,
     };
   },
-
+  computed : {
+    filterProducts(){
+      return this.products.filter(element => element.name.toLowerCase().includes(this.search.toLowerCase())); 
+    }
+  },
   watch: {
     dialogDelete(val) {
       val || this.closeDelete();
