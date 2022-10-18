@@ -8,9 +8,6 @@
             <v-alert type="success" v-model="alert">
               {{ pageAction.split(" ").join("ed ") }} Sussessfully.
             </v-alert>
-            <v-alert type="warning" v-model="warnAlert">
-              Image is Required!
-            </v-alert>
             <div>
               <v-col class="text-right">
                 <v-btn
@@ -228,12 +225,10 @@ export default {
       discountPrice: null,
       productDetail: "",
       productDescription: "",
-      selectedTags: [],
       collection: "products",
       alert: false,
-      warnAlert: false,
       isActive: false,
-      imageUrl: null,
+      imageUrl: "",
       loading: [],
       pageAction: this.productCheck(),
       selectedTags: [],
@@ -306,7 +301,7 @@ export default {
   },
   mounted() {
     if (this.pageAction === "Edit Product") {
-      this.displayEditproduct();
+      this.displayEditedProduct();
     }
   },
   methods: {
@@ -317,10 +312,6 @@ export default {
     },
     async submitForm() {
       this.v$.$touch();
-      if (this.imageUrl === "") {
-        this.warnAlert = true;
-        setTimeout(() => (this.warnAlert = false), 3000);
-      }
       // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
       if (!this.v$.$error) {
         this.alert = true;
@@ -337,8 +328,8 @@ export default {
       this.isActive = false;
       this.productDescription = "";
       this.productDetail = "";
-      this.discountPrice = 0;
-      this.productPrice = 0;
+      this.discountPrice = null;
+      this.productPrice = null;
       this.category = [];
       this.emitter.emit("formSubmit");
       this.v$.$reset();
@@ -387,12 +378,12 @@ export default {
         });
       this.clearFields();
     },
-    async displayEditProduct() {
+    async displayEditedProduct() {
       let id = this.$route.params.id;
       const serviceApi = new Services();
       await serviceApi.get("products", id).then((res) => {
         res = JSON.parse(JSON.stringify(res));
-        this.availability = Boolean(res.active);
+        this.isActive = Boolean(res.availability);
         this.imageUrl = res.image;
         this.productName = res.name;
         this.productDescription = res.description;
