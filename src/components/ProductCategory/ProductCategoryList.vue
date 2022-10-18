@@ -56,26 +56,11 @@
             </td>
           </tr>
         </tbody>
-        <template v-slot:top>
-          <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card class="pl-3 pr-3 pb-3 pt-4">
-              <v-card-title class="text-h5 pa-2"
-                >Are you sure you want to delete this item?</v-card-title
-              >
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="primary" text @click="closeDelete">Cancel</v-btn>
-                <v-btn color="primary" text @click="deleteItemConfirm"
-                  >OK</v-btn
-                >
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </template>
-        <template v-slot:no-data>
-          <v-btn color="primary" @click="initialize"> Reset </v-btn>
-        </template>
+        <DeleteDialog
+          v-if="dialogDelete"
+          @delete="deleteItemConfirm"
+          @closeDialog="closeDelete"
+        />
       </v-table>
     </v-card>
   </div>
@@ -91,7 +76,11 @@ import {
 } from "firebase/storage";
 import firebase from "@/firebase";
 import Services from "@/helpers/api";
+import { defineAsyncComponent } from "vue";
 export default {
+  components: {
+    DeleteDialog: defineAsyncComponent(() => import("../DeleteDialog.vue")),
+  },
   data() {
     return {
       search: "",
@@ -136,9 +125,6 @@ export default {
   },
 
   watch: {
-    dialog(val) {
-      val || this.close();
-    },
     dialogDelete(val) {
       val || this.closeDelete();
     },
@@ -186,29 +172,12 @@ export default {
       await serviceApi.delete("categories", this.editedItem.id);
     },
 
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.categories[this.editedIndex], this.editedItem);
-      } else {
-        this.categories.push(this.editedItem);
-      }
-      this.close();
     },
     download() {
       // Create a reference to the file we want to download
