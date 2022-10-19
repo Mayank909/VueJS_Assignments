@@ -1,7 +1,7 @@
 <template>
   <v-text-field
     v-model="search"
-    @keypress="searchQuery"
+    @keyup="searchQuery"
     append-inner-icon="mdi-magnify"
     density="compact"
     variant="outlined"
@@ -18,11 +18,11 @@ export default {
     search : "",
     }
   },
-  computed: {
-    searchQuery(){
-      this.$emit('searchQuery', this.search)
+  methods: {
+     searchQuery(){
+      this.$emit('searchQuery', this.search.trim())
     }
-  },
+  }
 };
 </script>
 

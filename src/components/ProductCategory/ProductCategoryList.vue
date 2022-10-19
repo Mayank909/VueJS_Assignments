@@ -5,7 +5,13 @@
         <v-spacer></v-spacer>
 
         <div color="surface" class="d-flex justify-space-around mt-4 mb-4">
-          <Search @searchQuery="(value)=>{this.search = value;}" />
+          <Search
+            @searchQuery="
+              (value) => {
+                this.search = value;
+              }
+            "
+          />
           <v-spacer></v-spacer>
           <v-btn color="primary" dark class="mb-2" @click="editItem()">
             New Category
@@ -15,8 +21,12 @@
       <v-table style="background-color: #090c0f" :search="search" class="mb-10">
         <thead>
           <tr>
-            <th v-for="header in headers" :key="header"  :class="header" >
-              <div class="text-capitalize"  v-text="header.text" />
+            <th v-for="header in headers" :key="header" :class="header">
+              <div
+                class="text-capitalize"
+                @click="sortByColumn(header)"
+                v-text="header.text"
+              />
             </th>
           </tr>
         </thead>
@@ -47,7 +57,8 @@
             </td>
           </tr>
         </tbody>
-        <DeleteDialog
+        <component
+          :is="deleteComponent"
           v-if="dialogDelete"
           @delete="deleteItemConfirm"
           @closeDialog="closeDelete"
@@ -68,7 +79,7 @@ import {
 import firebase from "@/firebase";
 import Services from "@/helpers/api";
 import { defineAsyncComponent } from "vue";
-import  Search  from "@/components/Search.vue"
+import Search from "@/components/Search.vue";
 export default {
   components: {
     DeleteDialog: defineAsyncComponent(() => import("../DeleteDialog.vue")),
@@ -78,6 +89,7 @@ export default {
     return {
       search: "",
       dialogDelete: false,
+      deleteComponent: "",
       headers: [
         {
           text: "Id",
@@ -114,10 +126,13 @@ export default {
       dialogDelete: false,
     };
   },
-  computed : {
-    filterCategories(){
-      return this.categories.filter(element => element.name.toLowerCase().includes(this.search.toLowerCase())); 
-    }
+  computed: {
+    filterCategories() {
+      let result = this.categories.filter((element) =>
+        element.name.toLowerCase().includes(this.search.toLowerCase())
+      );
+      return result;
+    },
   },
 
   watch: {
@@ -148,6 +163,22 @@ export default {
       });
       this.download();
     },
+    sortByColumn(column) {
+      switch (column.value) {
+        case "name":
+          this.categories.sort( (first, second) => (first.name.toLowerCase() < second.name.toLowerCase()) ? -1 : 1 );
+            // -1 for not require to sort 
+            // 1 for require a sort 
+          break;
+        case "active":
+          this.categories.sort((element) => (element.isActive ? -1 : 1));
+          // -1 for not require to sort 
+          // 1 for require a sort 
+          break;
+        default:
+          break;
+      }
+    },
 
     editItem(item = { id: 0 }) {
       let id = item.id;
@@ -158,6 +189,7 @@ export default {
         (element) => element.id === item.id
       );
       this.dialogDelete = true;
+      this.deleteComponent = "DeleteDialog";
     },
 
     async deleteItemConfirm() {

@@ -5,19 +5,30 @@
         <v-spacer></v-spacer>
 
         <div color="surface" class="d-flex justify-space-around mt-4 mb-4">
-          <Search @searchQuery="(value)=>{this.search = value;}" />
+          <Search
+            @searchQuery="
+              (value) => {
+                this.search = value;
+              }
+            "
+          />
 
           <v-spacer></v-spacer>
           <v-btn color="primary" dark class="mb-2" @click="editItem()">
             New Product
           </v-btn>
+          <v-combobox v-model="selectCategory" label="Category Filter"  hide-details dense filled :items="category" class="mb-2 ml-4" persistent-hint chips ></v-combobox>
         </div>
       </v-card-title>
       <v-table style="background-color: #090c0f" class="mb-10">
         <thead>
           <tr>
             <th v-for="header in headers" :key="header" :class="header">
-              <div class="text-capitalize" v-text="header.text" />
+              <div
+                class="text-capitalize"
+                @click="sortByColumn(header)"
+                v-text="header.text"
+              />
             </th>
           </tr>
         </thead>
@@ -51,7 +62,8 @@
             </td>
           </tr>
         </tbody>
-        <DeleteDialog
+        <component
+          :is="deleteComponent"
           v-if="dialogDelete"
           @delete="deleteItemConfirm"
           @closeDialog="closeDelete"
@@ -72,7 +84,7 @@ import {
 import firebase from "@/firebase";
 import Services from "@/helpers/api";
 import { defineAsyncComponent } from "vue";
-import  Search  from "@/components/Search.vue"
+import Search from "@/components/Search.vue";
 export default {
   components: {
     DeleteDialog: defineAsyncComponent(() => import("../DeleteDialog.vue")),
@@ -82,6 +94,9 @@ export default {
     return {
       search: "",
       dialogDelete: false,
+      deleteComponent: "",
+      selectCategory: "",
+      category: [],
       headers: [
         {
           text: "Id",
@@ -90,8 +105,8 @@ export default {
           value: "id",
         },
         { text: "Name", value: "name" },
-        { text: "Image", value: "image" },
-        { text: "Price", value: "price", sortable: false },
+        { text: "Image", value: "image", sortable: false },
+        { text: "Price", value: "price" },
         { text: "Discount_price", value: "discount_price" },
         { text: "Availability", value: "availability", sortable: false },
         { text: "Category", value: "category", sortable: false },
@@ -129,10 +144,21 @@ export default {
       dialogDelete: false,
     };
   },
-  computed : {
-    filterProducts(){
-      return this.products.filter(element => element.name.toLowerCase().includes(this.search.toLowerCase())); 
-    }
+  computed: {
+    filterProducts() {
+      return this.products.filter((element) =>{
+        if(!this.search == ""){
+          return element.name.toLowerCase().includes(this.search.toLowerCase())
+        }
+        else if(!this.selectCategory == ""){
+          return element.category === this.selectCategory;
+        }
+        else{
+          return element;
+        }
+      } 
+      );
+    },
   },
   watch: {
     dialogDelete(val) {
@@ -164,6 +190,7 @@ export default {
           };
         });
         this.products = result;
+        this.category = [...new Set(result.map((response)=>response.category))];
       });
       this.download();
     },
@@ -172,10 +199,35 @@ export default {
       let id = item.id;
       this.$router.push({ name: "product_update", params: { id } });
     },
-
+    sortByColumn(column) {
+      switch (column.value) {
+        case "name":
+          this.products.sort((first, second) =>
+            first.name.toLowerCase() < second.name.toLowerCase() ? -1 : 1
+          );
+          // -1 for not require to sort
+          // 1 for require a sort
+          break;
+        case "price":
+          this.products.sort((first, second) => first.price - second.price);
+          // -1 for not require to sort
+          // 1 for require a sort
+          break;
+        case "discount_price":
+          this.products.sort(
+            (first, second) => first.discount_price - second.discount_price
+          );
+          // -1 for not require to sort
+          // 1 for require a sort
+          break;
+        default:
+          break;
+      }
+    },
     deleteItem(item) {
       this.editedItem = this.products.find((element) => element.id === item.id);
       this.dialogDelete = true;
+      this.deleteComponent = "DeleteDialog";
     },
 
     async deleteItemConfirm() {

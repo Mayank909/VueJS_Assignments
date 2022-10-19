@@ -23,27 +23,27 @@ const routes = [
       {
         path: '/product',
         name: 'product',
-        component: () => import(/* webpackChunkName: "about" */ '@/views/Dashboard/Product.vue')
+        component: () => import(/* webpackChunkName: "product" */ '@/views/Dashboard/Product.vue')
       },
       {
         path: '/menu',
         name: 'menu',
-        component: () => import(/* webpackChunkName: "about" */ '@/views/Dashboard/Product.vue')
+        component: () => import(/* webpackChunkName: "menu" */ '@/views/Dashboard/Product.vue')
       },
       {
         path: '/category',
         name: 'category',
-        component: () => import(/* webpackChunkName: "about" */ '@/views/Dashboard/ProductCategory.vue')
+        component: () => import(/* webpackChunkName: "category" */ '@/views/Dashboard/ProductCategory.vue')
       },
       {
         path: '/product_category_update/:id',
         name: 'product_category_update',
-        component: () => import(/* webpackChunkName: "about" */ '@/views/Dashboard/ProductCategoryUpdate.vue')
+        component: () => import(/* webpackChunkName: "roduct_category_update" */ '@/views/Dashboard/ProductCategoryUpdate.vue')
       },
       {
         path: '/product_update/:id',
         name: 'product_update',
-        component: () => import(/* webpackChunkName: "about" */ '@/views/Dashboard/ProductUpdate.vue')
+        component: () => import(/* webpackChunkName: "product_update" */ '@/views/Dashboard/ProductUpdate.vue')
       }
     ]
   },
