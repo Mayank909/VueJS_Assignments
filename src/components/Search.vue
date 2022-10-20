@@ -5,7 +5,7 @@
     append-inner-icon="mdi-magnify"
     density="compact"
     variant="outlined"
-    label="Search Category"
+    :label=" `Search ${labelName}`"
     single-line
     hide-details
   ></v-text-field>
@@ -13,6 +13,9 @@
 
 <script>
 export default {
+  props: {
+    labelName : String,
+  },
   data(){
    return {
     search : "",

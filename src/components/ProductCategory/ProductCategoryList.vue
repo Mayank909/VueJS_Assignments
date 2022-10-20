@@ -5,7 +5,8 @@
         <v-spacer></v-spacer>
 
         <div color="surface" class="d-flex justify-space-around mt-4 mb-4">
-          <Search
+          <component :is="searchComponent"
+            :labelName="componentName"
             @searchQuery="
               (value) => {
                 this.search = value;
@@ -18,10 +19,10 @@
           </v-btn>
         </div>
       </v-card-title>
-      <v-table style="background-color: #090c0f" :search="search" class="mb-10">
+      <v-table style="background-color: #090c0f"  class="mb-10">
         <thead>
           <tr>
-            <th v-for="header in headers" :key="header" :class="header">
+            <th v-for="header in headers" :key="header" >
               <div
                 class="text-capitalize"
                 @click="sortByColumn(header)"
@@ -90,6 +91,8 @@ export default {
       search: "",
       dialogDelete: false,
       deleteComponent: "",
+      searchComponent: "Search",
+      componentName: "Category",
       headers: [
         {
           text: "Id",
