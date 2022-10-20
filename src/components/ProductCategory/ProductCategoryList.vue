@@ -5,7 +5,8 @@
         <v-spacer></v-spacer>
 
         <div color="surface" class="d-flex justify-space-around mt-4 mb-4">
-          <component :is="searchComponent"
+          <component
+            :is="searchComponent"
             :labelName="componentName"
             @searchQuery="
               (value) => {
@@ -19,15 +20,17 @@
           </v-btn>
         </div>
       </v-card-title>
-      <v-table style="background-color: #090c0f"  class="mb-10">
+      <v-table style="background-color: #090c0f" class="mb-10">
         <thead>
           <tr>
-            <th v-for="header in headers" :key="header" >
+            <th v-for="header in headers" :key="header">
               <div
                 class="text-capitalize"
                 @click="sortByColumn(header)"
-                v-text="header.text"
-              />
+              >
+              {{ header.text}}
+              <v-icon dense  v-if="header.sortable" >mdi-arrow-up</v-icon>
+              </div>
             </th>
           </tr>
         </thead>
@@ -92,6 +95,7 @@ export default {
       dialogDelete: false,
       deleteComponent: "",
       searchComponent: "Search",
+      isSort: false,
       componentName: "Category",
       headers: [
         {
@@ -166,21 +170,9 @@ export default {
       });
       this.download();
     },
-    sortByColumn(column) {
-      switch (column.value) {
-        case "name":
-          this.categories.sort( (first, second) => (first.name.toLowerCase() < second.name.toLowerCase()) ? -1 : 1 );
-            // -1 for not require to sort 
-            // 1 for require a sort 
-          break;
-        case "active":
-          this.categories.sort((element) => (element.isActive ? -1 : 1));
-          // -1 for not require to sort 
-          // 1 for require a sort 
-          break;
-        default:
-          break;
-      }
+     sortByColumn(column) {
+      const serviceApi = new Services();
+      this.categories =  serviceApi.sortData(column, this.headers , this.categories);
     },
 
     editItem(item = { id: 0 }) {

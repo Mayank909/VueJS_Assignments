@@ -39,8 +39,10 @@
               <div
                 class="text-capitalize"
                 @click="sortByColumn(header)"
-                v-text="header.text"
-              />
+              >
+              {{ header.text }}
+              <v-icon dense v-if="header.sortable" >mdi-arrow-up</v-icon>
+              </div>
             </th>
           </tr>
         </thead>
@@ -115,7 +117,7 @@ export default {
         {
           text: "Id",
           align: "start",
-          sortable: true,
+          sortable: false,
           value: "id",
         },
         { text: "Name", value: "name" },
@@ -221,29 +223,8 @@ export default {
       this.$router.push({ name: "product_update", params: { id } });
     },
     sortByColumn(column) {
-      switch (column.value) {
-        case "name":
-          this.products.sort((first, second) =>
-            first.name.toLowerCase() < second.name.toLowerCase() ? -1 : 1
-          );
-          // -1 for not require to sort
-          // 1 for require a sort
-          break;
-        case "price":
-          this.products.sort((first, second) => first.price - second.price);
-          // -1 for not require to sort
-          // 1 for require a sort
-          break;
-        case "discount_price":
-          this.products.sort(
-            (first, second) => first.discount_price - second.discount_price
-          );
-          // -1 for not require to sort
-          // 1 for require a sort
-          break;
-        default:
-          break;
-      }
+      const serviceApi = new Services();
+      this.products =  serviceApi.sortData(column, this.headers , this.products);
     },
     deleteItem(item) {
       this.editedItem = this.products.find((element) => element.id === item.id);
