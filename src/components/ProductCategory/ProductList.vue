@@ -5,7 +5,8 @@
         <v-spacer></v-spacer>
 
         <div color="surface" class="d-flex justify-space-around mt-4 mb-4">
-          <Search
+          <component
+            :is="searchComponent"
             @searchQuery="
               (value) => {
                 this.search = value;
@@ -17,7 +18,17 @@
           <v-btn color="primary" dark class="mb-2" @click="editItem()">
             New Product
           </v-btn>
-          <v-combobox v-model="selectCategory" label="Category Filter"  hide-details dense filled :items="category" class="mb-2 ml-4" persistent-hint chips ></v-combobox>
+          <v-combobox
+            v-model="selectCategory"
+            label="Category Filter"
+            hide-details
+            dense
+            filled
+            :items="category"
+            class="mb-2 ml-4"
+            persistent-hint
+            chips
+          ></v-combobox>
         </div>
       </v-card-title>
       <v-table style="background-color: #090c0f" class="mb-10">
@@ -95,6 +106,7 @@ export default {
       search: "",
       dialogDelete: false,
       deleteComponent: "",
+      searchComponent: "Search",
       selectCategory: "",
       category: [],
       headers: [
@@ -146,18 +158,23 @@ export default {
   },
   computed: {
     filterProducts() {
-      return this.products.filter((element) =>{
-        if(!this.search == ""){
-          return element.name.toLowerCase().includes(this.search.toLowerCase())
-        }
-        else if(!this.selectCategory == ""){
+      let result = this.products.filter((element) => {
+        if (!this.search == "" && this.selectCategory == "") {
+          return element.name.toLowerCase().includes(this.search.toLowerCase());
+        } else if (!this.selectCategory == "") {
           return element.category === this.selectCategory;
-        }
-        else{
+        } else {
           return element;
         }
-      } 
-      );
+      });
+      result = result.filter((element) => {
+        if (!this.selectCategory == "" && !this.search == "") {
+          return element.name.toLowerCase().includes(this.search.toLowerCase());
+        } else {
+          return element;
+        }
+      });
+      return result;
     },
   },
   watch: {
@@ -190,7 +207,9 @@ export default {
           };
         });
         this.products = result;
-        this.category = [...new Set(result.map((response)=>response.category))];
+        this.category = [
+          ...new Set(result.map((response) => response.category)),
+        ];
       });
       this.download();
     },
