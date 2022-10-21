@@ -24,12 +24,9 @@
         <thead>
           <tr>
             <th v-for="header in headers" :key="header">
-              <div
-                class="text-capitalize"
-                @click="sortByColumn(header)"
-              >
-              {{ header.text}}
-              <v-icon dense  v-if="header.sortable" >mdi-arrow-up</v-icon>
+              <div class="text-capitalize" @click="sortByColumn(header)">
+                {{ header.text }}
+                <v-icon dense v-if="header.sortable">mdi-arrow-up</v-icon>
               </div>
             </th>
           </tr>
@@ -58,6 +55,26 @@
             <td>
               <v-icon small @click="editItem(item)">mdi-pencil</v-icon>
               <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+            </td>
+          </tr>
+          <tr>
+            <td :colspan="numberBlank" >
+              <div class="text-right">
+                <label for="cars">Rows Per Page:</label>
+              
+              <select class="ml-2" id="selectedRow" @click="changeRows" style="background-color: white; color: black;" >
+                <option v-for="row in rowSelection" text-color="black" :key="row" :value="row">{{ row }}</option>
+              </select>
+              </div>
+            </td>
+            <td :colspan="contentSpan">
+              <v-btn :disabled="isInFirstPage" @click="movePages(-1)"
+                ><v-icon large> mdi-chevron-left </v-icon></v-btn
+              >
+              {{ currentPage }} out of {{ numberOfPages }}
+              <v-btn :disabled="isInLastPage" @click="movePages(1)"
+                ><v-icon large> mdi-chevron-right </v-icon></v-btn
+              >
             </td>
           </tr>
         </tbody>
@@ -97,6 +114,15 @@ export default {
       searchComponent: "Search",
       isSort: false,
       componentName: "Category",
+      rowsPerPage: 5,
+      isInFirstPage: true,
+      isInLastPage: false,
+      currentPage: 1,
+      numberOfPages: 0,
+      numberBlank: 4,
+      contentSpan: 2,
+      rowSelection: [5,10,15,20],
+      paginatedCategory: [],
       headers: [
         {
           text: "Id",
@@ -138,7 +164,14 @@ export default {
       let result = this.categories.filter((element) =>
         element.name.toLowerCase().includes(this.search.toLowerCase())
       );
-      return result;
+
+      if (!this.search == "") {
+        this.resetPaginate();
+        this.movePages(0, result);
+      } else {
+        this.movePages(0);
+      }
+      return this.paginatedCategory;
     },
   },
 
@@ -167,14 +200,67 @@ export default {
           };
         });
         this.categories = result;
+        this.paginatedCategory = this.categories;
       });
       this.download();
+      this.movePages();
     },
-     sortByColumn(column) {
+    sortByColumn(column) {
       const serviceApi = new Services();
-      this.categories =  serviceApi.sortData(column, this.headers , this.categories);
+      this.categories = serviceApi.sortData(
+        column,
+        this.headers,
+        this.categories
+      );
+      this.movePages();
     },
+    changeRows(){
+     this.rowsPerPage=selectedRow.value;
+    },
+    paginate(data, pageSize, pageNumber) {
+      // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
+      return data.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+    },
+    movePages(value = 0, result = null) {
+      this.currentPage = this.currentPage + value;
+      let categoriesLength = this.categories.length;
+      this.numberOfPages =
+        categoriesLength % this.rowsPerPage == 0
+          ? Math.floor(categoriesLength / this.rowsPerPage)
+          : Math.floor(categoriesLength / this.rowsPerPage) + 1;
+      //Apply Pagination
+      if (result) {
+        this.paginatedCategory = this.paginate(
+          result,
+          this.rowsPerPage,
+          this.currentPage
+        );
+      } else {
+        this.paginatedCategory = this.paginate(
+          this.categories,
+          this.rowsPerPage,
+          this.currentPage
+        );
+        console.log(this.currentPage);
+      }
 
+      if (this.currentPage == this.numberOfPages) {
+        this.isInLastPage = true;
+        this.isInFirstPage = false;
+        return;
+      }
+
+      if (this.currentPage === 1) {
+        this.isInFirstPage = true;
+        this.isInLastPage = false;
+        return;
+      }
+      this.isInFirstPage = false;
+    },
+    resetPaginate() {
+      this.currentPage = 1;
+      this.rowsPerPage = 5;
+    },
     editItem(item = { id: 0 }) {
       let id = item.id;
       this.$router.push({ name: "product_category_update", params: { id } });
