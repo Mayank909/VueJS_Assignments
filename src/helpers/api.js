@@ -85,7 +85,7 @@ export default class Services {
         dataLength % paginateObject.rowsPerPage == 0
           ? Math.floor(dataLength / paginateObject.rowsPerPage)
           : Math.floor(dataLength / paginateObject.rowsPerPage) + 1;
-      //Apply Pagination
+      //store paginated data by calling paginate function 
       if (filteredResult) {
         paginateObject.paginatedItem = this.paginate(
           filteredResult,
@@ -98,21 +98,7 @@ export default class Services {
           paginateObject.rowsPerPage,
           paginateObject.currentPage
         );
-        console.log(paginateObject.currentPage);
       }
-
-      if (paginateObject.currentPage == paginateObject.numberOfPages) {
-        paginateObject.isInLastPage = true;
-        paginateObject.isInFirstPage = false;
-        return paginateObject;
-      }
-
-      if (paginateObject.currentPage === 1) {
-        paginateObject.isInFirstPage = true;
-        paginateObject.isInLastPage = false;
-        return paginateObject;
-      }
-      paginateObject.isInFirstPage = false;
       return paginateObject;
   }
 }

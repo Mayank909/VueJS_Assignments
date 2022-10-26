@@ -58,23 +58,35 @@
             </td>
           </tr>
           <tr>
-            <td :colspan="numberBlank" >
+            <td :colspan="numberBlank">
               <div class="text-right">
                 <label for="cars">Rows Per Page:</label>
-              
-              <select class="ml-2" id="selectedRow" @click="changeRows" style="background-color: white; color: black;" >
-                <option v-for="row in rowSelection" text-color="black" :key="row" :value="row">{{ row }}</option>
-              </select>
+
+                <select
+                  class="ml-2"
+                  id="selectedRow"
+                  @click="changeRows"
+                  style="background-color: white; color: black"
+                >
+                  <option
+                    v-for="row in rowSelection"
+                    text-color="black"
+                    :key="row"
+                    :value="row"
+                  >
+                    {{ row }}
+                  </option>
+                </select>
               </div>
             </td>
             <td :colspan="contentSpan">
-              <v-btn :disabled="paginateObject.isInFirstPage" @click="movePages(-1)"
-                ><v-icon large> mdi-chevron-left </v-icon></v-btn
-              >
-              {{ paginateObject.currentPage }} out of {{ paginateObject.numberOfPages }}
-              <v-btn :disabled="paginateObject.isInLastPage" @click="movePages(1)"
-                ><v-icon large> mdi-chevron-right </v-icon></v-btn
-              >
+              <div class="text-center">
+                <v-pagination
+                  v-model="paginateObject.currentPage"
+                  :length="paginateObject.numberOfPages"
+                  :total-visible="paginateObject.rowsPerPage"
+                ></v-pagination>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -122,9 +134,9 @@ export default {
         numberOfPages: 0,
         paginatedItem: [],
       },
-      numberBlank: 4,
-      contentSpan: 2,
-      rowSelection: [5,10,15,20],
+      numberBlank: 2,
+      contentSpan: 4,
+      rowSelection: [5, 10, 15, 20],
       headers: [
         {
           text: "Id",
@@ -216,8 +228,8 @@ export default {
       );
       this.movePages();
     },
-    changeRows(){
-     this.paginateObject.rowsPerPage=selectedRow.value;
+    changeRows() {
+      this.paginateObject.rowsPerPage = selectedRow.value;
     },
     movePages(value = 0, filteredResult = null) {
       const serviceApi = new Services();
@@ -227,7 +239,6 @@ export default {
         this.categories,
         this.paginateObject
       );
-     
     },
     resetPaginate() {
       this.paginateObject.currentPage = 1;
