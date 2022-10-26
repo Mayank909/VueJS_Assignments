@@ -68,11 +68,11 @@
               </div>
             </td>
             <td :colspan="contentSpan">
-              <v-btn :disabled="isInFirstPage" @click="movePages(-1)"
+              <v-btn :disabled="paginateObject.isInFirstPage" @click="movePages(-1)"
                 ><v-icon large> mdi-chevron-left </v-icon></v-btn
               >
-              {{ currentPage }} out of {{ numberOfPages }}
-              <v-btn :disabled="isInLastPage" @click="movePages(1)"
+              {{ paginateObject.currentPage }} out of {{ paginateObject.numberOfPages }}
+              <v-btn :disabled="paginateObject.isInLastPage" @click="movePages(1)"
                 ><v-icon large> mdi-chevron-right </v-icon></v-btn
               >
             </td>
@@ -114,15 +114,17 @@ export default {
       searchComponent: "Search",
       isSort: false,
       componentName: "Category",
-      rowsPerPage: 5,
-      isInFirstPage: true,
-      isInLastPage: false,
-      currentPage: 1,
-      numberOfPages: 0,
+      paginateObject: {
+        rowsPerPage: 5,
+        isInFirstPage: true,
+        isInLastPage: false,
+        currentPage: 1,
+        numberOfPages: 0,
+        paginatedCategory: [],
+      },
       numberBlank: 4,
       contentSpan: 2,
       rowSelection: [5,10,15,20],
-      paginatedCategory: [],
       headers: [
         {
           text: "Id",
@@ -171,7 +173,7 @@ export default {
       } else {
         this.movePages(0);
       }
-      return this.paginatedCategory;
+      return this.paginateObject.paginatedCategory;
     },
   },
 
@@ -200,7 +202,7 @@ export default {
           };
         });
         this.categories = result;
-        this.paginatedCategory = this.categories;
+        this.paginateObject.paginatedCategory = this.categories;
       });
       this.download();
       this.movePages();
@@ -215,51 +217,54 @@ export default {
       this.movePages();
     },
     changeRows(){
-     this.rowsPerPage=selectedRow.value;
+     this.paginateObject.rowsPerPage=selectedRow.value;
     },
+    //service
     paginate(data, pageSize, pageNumber) {
       // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
       return data.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
     },
+   //service
     movePages(value = 0, result = null) {
-      this.currentPage = this.currentPage + value;
+      this.paginateObject.currentPage = this.paginateObject.currentPage + value;
       let categoriesLength = this.categories.length;
-      this.numberOfPages =
-        categoriesLength % this.rowsPerPage == 0
-          ? Math.floor(categoriesLength / this.rowsPerPage)
-          : Math.floor(categoriesLength / this.rowsPerPage) + 1;
+      // This is for checking Even and Odd number of item and divde pages accordingly.  
+      this.paginateObject.numberOfPages =
+        categoriesLength % this.paginateObject.rowsPerPage == 0
+          ? Math.floor(categoriesLength / this.paginateObject.rowsPerPage)
+          : Math.floor(categoriesLength / this.paginateObject.rowsPerPage) + 1;
       //Apply Pagination
       if (result) {
-        this.paginatedCategory = this.paginate(
+        this.paginateObject.paginatedCategory = this.paginate(
           result,
-          this.rowsPerPage,
-          this.currentPage
+          this.paginateObject.rowsPerPage,
+          this.paginateObject.currentPage
         );
       } else {
-        this.paginatedCategory = this.paginate(
+        this.paginateObject.paginatedCategory = this.paginate(
           this.categories,
-          this.rowsPerPage,
-          this.currentPage
+          this.paginateObject.rowsPerPage,
+          this.paginateObject.currentPage
         );
-        console.log(this.currentPage);
+        console.log(this.paginateObject.currentPage);
       }
 
-      if (this.currentPage == this.numberOfPages) {
-        this.isInLastPage = true;
-        this.isInFirstPage = false;
+      if (this.paginateObject.currentPage == this.paginateObject.numberOfPages) {
+        this.paginateObject.isInLastPage = true;
+        this.paginateObject.isInFirstPage = false;
         return;
       }
 
-      if (this.currentPage === 1) {
-        this.isInFirstPage = true;
-        this.isInLastPage = false;
+      if (this.paginateObject.currentPage === 1) {
+        this.paginateObject.isInFirstPage = true;
+        this.paginateObject.isInLastPage = false;
         return;
       }
-      this.isInFirstPage = false;
+      this.paginateObject.isInFirstPage = false;
     },
     resetPaginate() {
-      this.currentPage = 1;
-      this.rowsPerPage = 5;
+      this.paginateObject.currentPage = 1;
+      this.paginateObject.rowsPerPage = 5;
     },
     editItem(item = { id: 0 }) {
       let id = item.id;
