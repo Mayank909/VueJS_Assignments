@@ -124,7 +124,6 @@ export default {
       dialogDelete: false,
       deleteComponent: "",
       searchComponent: "Search",
-      isSort: false,
       componentName: "Category",
       paginateObject: {
         rowsPerPage: 5,
