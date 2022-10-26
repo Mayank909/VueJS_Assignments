@@ -73,4 +73,48 @@ export default class Services {
     }
     return tableData;
   }
+  paginate(data, pageSize, pageNumber) {
+    // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
+    return data.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+  }
+  pageMove(value, filteredResult, tableData, paginateObject){
+    paginateObject.currentPage = paginateObject.currentPage + value;
+      let dataLength = tableData.length;
+      // This is for checking Even and Odd number of item and divde pages accordingly.  
+      paginateObject.numberOfPages =
+        dataLength % paginateObject.rowsPerPage == 0
+          ? Math.floor(dataLength / paginateObject.rowsPerPage)
+          : Math.floor(dataLength / paginateObject.rowsPerPage) + 1;
+      //Apply Pagination
+      if (filteredResult) {
+        paginateObject.paginatedItem = this.paginate(
+          filteredResult,
+          paginateObject.rowsPerPage,
+          paginateObject.currentPage
+        );
+      } else {
+        paginateObject.paginatedItem = this.paginate(
+          tableData,
+          paginateObject.rowsPerPage,
+          paginateObject.currentPage
+        );
+        console.log(paginateObject.currentPage);
+      }
+
+      if (paginateObject.currentPage == paginateObject.numberOfPages) {
+        paginateObject.isInLastPage = true;
+        paginateObject.isInFirstPage = false;
+        return paginateObject;
+      }
+
+      if (paginateObject.currentPage === 1) {
+        paginateObject.isInFirstPage = true;
+        paginateObject.isInLastPage = false;
+        return paginateObject;
+      }
+      paginateObject.isInFirstPage = false;
+      return paginateObject;
+  }
 }
+
+
