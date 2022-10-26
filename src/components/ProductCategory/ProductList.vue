@@ -35,13 +35,10 @@
       <v-table style="background-color: #090c0f" class="mb-10">
         <thead>
           <tr>
-            <th v-for="header in headers" :key="header" >
-              <div
-                class="text-capitalize"
-                @click="sortByColumn(header)"
-              >
-              {{ header.text }}
-              <v-icon dense v-if="header.sortable" >mdi-arrow-up</v-icon>
+            <th v-for="header in headers" :key="header">
+              <div class="text-capitalize" @click="sortByColumn(header)">
+                {{ header.text }}
+                <v-icon dense v-if="header.sortable">mdi-arrow-up</v-icon>
               </div>
             </th>
           </tr>
@@ -73,6 +70,38 @@
             <td>
               <v-icon small @click="editItem(item)">mdi-pencil</v-icon>
               <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
+            </td>
+          </tr>
+          <tr>
+            <td :colspan="numberBlank">
+              <div class="text-right">
+                <label for="cars">Rows Per Page:</label>
+
+                <select
+                  class="ml-2"
+                  id="selectedRow"
+                  @click="changeRows"
+                  style="background-color: white; color: black"
+                >
+                  <option
+                    v-for="row in rowSelection"
+                    text-color="black"
+                    :key="row"
+                    :value="row"
+                  >
+                    {{ row }}
+                  </option>
+                </select>
+              </div>
+            </td>
+            <td :colspan="contentSpan">
+              <div class="text-center">
+                <v-pagination
+                  v-model="paginateObject.currentPage"
+                  :length="paginateObject.numberOfPages"
+                  :total-visible="paginateObject.rowsPerPage"
+                ></v-pagination>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -113,6 +142,17 @@ export default {
       componentName: "Product",
       selectCategory: "",
       category: [],
+      paginateObject: {
+        rowsPerPage: 5,
+        isInFirstPage: true,
+        isInLastPage: false,
+        currentPage: 1,
+        numberOfPages: 0,
+        paginatedItem: [],
+      },
+      numberBlank: 4,
+      contentSpan: 5,
+      rowSelection: [5, 10, 15, 20],
       headers: [
         {
           text: "Id",
@@ -178,7 +218,13 @@ export default {
           return element;
         }
       });
-      return result;
+      if (!this.search == "" || !this.selectCategory == "") {
+        this.resetPaginate();
+        this.movePages(0, result);
+      } else {
+        this.movePages(0);
+      }
+      return this.paginateObject.paginatedItem;
     },
   },
   watch: {
@@ -212,22 +258,43 @@ export default {
         });
         //For Unique category selection.
         this.products = result;
+        this.paginateObject.paginatedItem = this.products;
         this.category = [
           ...new Set(result.map((response) => response.category)),
         ];
         //For sorted category options
-        this.category.sort((first, second)=>first.toLowerCase() < second.toLowerCase()? -1 : 1);
+        this.category.sort((first, second) =>
+          first.toLowerCase() < second.toLowerCase() ? -1 : 1
+        );
       });
       this.download();
+      this.movePages();
     },
 
+    sortByColumn(column) {
+      const serviceApi = new Services();
+      this.products = serviceApi.sortData(column, this.headers, this.products);
+      this.movePages();
+    },
+    changeRows() {
+      this.paginateObject.rowsPerPage = selectedRow.value;
+    },
+    movePages(value = 0, filteredResult = null) {
+      const serviceApi = new Services();
+      this.paginateObject = serviceApi.pageMove(
+        value,
+        filteredResult,
+        this.products,
+        this.paginateObject
+      );
+    },
+    resetPaginate() {
+      this.paginateObject.currentPage = 1;
+      this.paginateObject.rowsPerPage = 5;
+    },
     editItem(item = { id: 0 }) {
       let id = item.id;
       this.$router.push({ name: "product_update", params: { id } });
-    },
-    sortByColumn(column) {
-      const serviceApi = new Services();
-      this.products =  serviceApi.sortData(column, this.headers , this.products);
     },
     deleteItem(item) {
       this.editedItem = this.products.find((element) => element.id === item.id);
