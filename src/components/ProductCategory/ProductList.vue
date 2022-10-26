@@ -152,7 +152,7 @@ export default {
         detail: "",
         description: "",
         availability: false,
-        category: "",
+        category: [],
         tags: [],
       },
       loading: false,
@@ -210,10 +210,13 @@ export default {
             tags: data.document.tags,
           };
         });
+        //For Unique category selection.
         this.products = result;
         this.category = [
           ...new Set(result.map((response) => response.category)),
         ];
+        //For sorted category options
+        this.category.sort((first, second)=>first.toLowerCase() < second.toLowerCase()? -1 : 1);
       });
       this.download();
     },
