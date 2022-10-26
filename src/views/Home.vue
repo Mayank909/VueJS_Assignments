@@ -1,18 +1,22 @@
 <template>
-  <CaroselSlider/>
+  <v-layout>
+    <Header />
+    <v-main>
+      <CaroselSlider />
+    </v-main>
+  </v-layout>
 </template>
 
 <script>
-import CaroselSlider from "../components/CaroselSlider.vue"
+import Header from "@/components/Header.vue";
+import CaroselSlider from "../components/CaroselSlider.vue";
 export default {
-  name: 'home',
+  name: "home",
   components: {
-    CaroselSlider
-  }
-
-}
+    CaroselSlider,
+    Header,
+  },
+};
 </script>
 
-<style>
-
-</style>
+<style></style>
