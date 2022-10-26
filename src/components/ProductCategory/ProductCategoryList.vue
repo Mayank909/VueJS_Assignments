@@ -120,7 +120,7 @@ export default {
         isInLastPage: false,
         currentPage: 1,
         numberOfPages: 0,
-        paginatedCategory: [],
+        paginatedItem: [],
       },
       numberBlank: 4,
       contentSpan: 2,
@@ -173,7 +173,7 @@ export default {
       } else {
         this.movePages(0);
       }
-      return this.paginateObject.paginatedCategory;
+      return this.paginateObject.paginatedItem;
     },
   },
 
@@ -202,7 +202,7 @@ export default {
           };
         });
         this.categories = result;
-        this.paginateObject.paginatedCategory = this.categories;
+        this.paginateObject.paginatedItem = this.categories;
       });
       this.download();
       this.movePages();
@@ -219,48 +219,15 @@ export default {
     changeRows(){
      this.paginateObject.rowsPerPage=selectedRow.value;
     },
-    //service
-    paginate(data, pageSize, pageNumber) {
-      // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
-      return data.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
-    },
-   //service
-    movePages(value = 0, result = null) {
-      this.paginateObject.currentPage = this.paginateObject.currentPage + value;
-      let categoriesLength = this.categories.length;
-      // This is for checking Even and Odd number of item and divde pages accordingly.  
-      this.paginateObject.numberOfPages =
-        categoriesLength % this.paginateObject.rowsPerPage == 0
-          ? Math.floor(categoriesLength / this.paginateObject.rowsPerPage)
-          : Math.floor(categoriesLength / this.paginateObject.rowsPerPage) + 1;
-      //Apply Pagination
-      if (result) {
-        this.paginateObject.paginatedCategory = this.paginate(
-          result,
-          this.paginateObject.rowsPerPage,
-          this.paginateObject.currentPage
-        );
-      } else {
-        this.paginateObject.paginatedCategory = this.paginate(
-          this.categories,
-          this.paginateObject.rowsPerPage,
-          this.paginateObject.currentPage
-        );
-        console.log(this.paginateObject.currentPage);
-      }
-
-      if (this.paginateObject.currentPage == this.paginateObject.numberOfPages) {
-        this.paginateObject.isInLastPage = true;
-        this.paginateObject.isInFirstPage = false;
-        return;
-      }
-
-      if (this.paginateObject.currentPage === 1) {
-        this.paginateObject.isInFirstPage = true;
-        this.paginateObject.isInLastPage = false;
-        return;
-      }
-      this.paginateObject.isInFirstPage = false;
+    movePages(value = 0, filteredResult = null) {
+      const serviceApi = new Services();
+      this.paginateObject = serviceApi.pageMove(
+        value,
+        filteredResult,
+        this.categories,
+        this.paginateObject
+      );
+     
     },
     resetPaginate() {
       this.paginateObject.currentPage = 1;
