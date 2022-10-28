@@ -1,10 +1,17 @@
 import { setDoc, doc } from "firebase/firestore";
+import { getDatabase, ref, set } from "firebase/database";
 import { db } from "@/firebase";
 
 export default class Services {
   async post(collectionName, id, payload) {
     const docRef = doc(db, collectionName, id);
     setDoc(docRef, payload);
+  }
+  async postUser(collectionName, payload){
+    payload.id = Math.floor(Math.random() * 100) + 1;
+    const dataBase = getDatabase();
+      await set(ref(dataBase, collectionName ), payload);
+    // await db.collection(collectionName).doc(userRef).update({ id : increment })
   }
   async getAll(collectionName) {
     const dataArray = [];
