@@ -1,38 +1,52 @@
 <template>
-  <v-app-bar color="surface" elevation="4" class="pa-5" density="compact">
-    <!-- <template v-slot:prepend>
+  <div>
+    <v-app-bar color="surface" elevation="4" class="pa-5" density="compact">
+      <!-- <template v-slot:prepend>
       <v-app-bar-nav-icon></v-app-bar-nav-icon>
     </template> -->
 
-    <v-app-bar-title
-      ><v-img
-        class="m-0"
-        :aspect-ratio="50 / 9"
-        max-height="80"
-        max-width="236"
-        src="../assets/applogo.png"
-      ></v-img>
-    </v-app-bar-title>
+      <v-app-bar-title
+        ><v-img
+          class="m-0"
+          :aspect-ratio="50 / 9"
+          max-height="80"
+          max-width="236"
+          src="../assets/applogo.png"
+        ></v-img>
+      </v-app-bar-title>
 
-    <v-tabs align-with-title>
-      <v-btn>Home</v-btn>
-      <v-btn :color="btnColorLogin" dark @click="displayLogin()"> Login </v-btn>
-      <v-btn :color="btnColorSignUp" dark @click="displaySignUp()"> Sign Up </v-btn>
-    </v-tabs>
+      <v-tabs align-with-title>
+        <v-btn>Home</v-btn>
+        <v-btn :color="btnColorLogin" dark @click="displayLogin()">
+          Login
+        </v-btn>
+        <v-btn :color="btnColorSignUp" dark @click="displaySignUp()">
+          Sign Up
+        </v-btn>
+      </v-tabs>
 
-    <template v-slot:append>
-      <v-btn icon>
-        <v-icon>mdi-cart-outline</v-icon>
-        <v-icon color="primary" class="zero-icon" size="20"
-          >mdi-numeric-0-circle</v-icon
-        >
-      </v-btn>
-    </template>
-    <component :is="loginComponent" v-if="loginClick" @login="loginSuccess"
-          @closeDialog="closeLogin" />
-    <component :is="signUpComponent" v-if="signUpClick" @signUp="signUpSuccess"
-          @closeDialog="closeSignUp" />
-  </v-app-bar>
+      <template v-slot:append>
+        <v-btn icon>
+          <v-icon>mdi-cart-outline</v-icon>
+          <v-icon color="primary" class="zero-icon" size="20"
+            >mdi-numeric-0-circle</v-icon
+          >
+        </v-btn>
+      </template>
+    </v-app-bar>
+    <component
+      :is="loginComponent"
+      v-if="loginClick"
+      @login="loginSuccess"
+      @closeDialog="closeLogin"
+    />
+    <component
+      :is="signUpComponent"
+      v-if="signUpClick"
+      @signUp="signUpSuccess"
+      @closeDialog="closeSignUp"
+    />
+  </div>
 </template>
 
 <script>
@@ -57,26 +71,26 @@ export default {
       this.loginComponent = "LoginForm";
       this.loginClick = true;
     },
-    loginSuccess(){
+    loginSuccess() {
       this.loginClick = false;
-      this.btnColorLogin =""
+      this.btnColorLogin = "";
     },
-    closeLogin(){
+    closeLogin() {
       this.loginClick = false;
-      this.btnColorLogin = ""
+      this.btnColorLogin = "";
     },
-     displaySignUp() {
+    displaySignUp() {
       this.btnColorSignUp = "primary";
       this.signUpComponent = "signUpForm";
       this.signUpClick = true;
     },
-     signUpSuccess(){
+    signUpSuccess() {
       this.signUpClick = false;
-      this.btnColorSignUp =""
+      this.btnColorSignUp = "";
     },
-    closeSignUp(){
+    closeSignUp() {
       this.signUpClick = false;
-      this.btnColorSignUp = ""
+      this.btnColorSignUp = "";
     },
   },
 };
