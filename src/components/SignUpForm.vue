@@ -151,7 +151,13 @@
 </template>
 <script>
 import useVuelidate from "@vuelidate/core";
-import { required, helpers, url } from "@vuelidate/validators";
+import {
+  required,
+  helpers,
+  sameAs,
+  minLength,
+  email,
+} from "@vuelidate/validators";
 import Services from "@/helpers/api";
 export default {
   data: () => ({
@@ -177,17 +183,30 @@ export default {
         $autoDirty: true,
       },
       email: {
+        email,
         required: helpers.withMessage("Email Name is Required!", required),
         $autoDirty: true,
       },
       password: {
         required: helpers.withMessage("Password is Required!", required),
+        containsPasswordRequirement: helpers.withMessage(
+          () =>
+            `The password requires an uppercase, lowercase, number and special character`,
+          (value) =>
+            /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/.test(value)
+        ),
+        minLengthValue: minLength(8),
         $autoDirty: true,
       },
       ConfirmPassword: {
         required: helpers.withMessage(
           "Confirm Password is Required!",
           required
+        ),
+        minLengthValue: minLength(8),
+        sameAsPassword: helpers.withMessage(
+          "The value must be equal to the Password value",
+          sameAs(this.password)
         ),
         $autoDirty: true,
       },
