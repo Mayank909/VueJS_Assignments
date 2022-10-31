@@ -231,6 +231,7 @@ export default {
           password: this.password,
           type: this.selectedType,
           gender: this.gender,
+          id : Math.floor(Math.random() * 100) + 1,
         };
         const serviceApi = new Services();
         await serviceApi

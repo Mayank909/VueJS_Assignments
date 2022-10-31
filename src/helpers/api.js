@@ -8,10 +8,7 @@ export default class Services {
     setDoc(docRef, payload);
   }
   async postUser(collectionName, payload){
-    payload.id = Math.floor(Math.random() * 100) + 1;
-    const dataBase = getDatabase();
-      await set(ref(dataBase, collectionName ), payload);
-    // await db.collection(collectionName).doc(userRef).update({ id : increment })
+     await db.collection("users").add(payload);
   }
   async getAll(collectionName) {
     const dataArray = [];
