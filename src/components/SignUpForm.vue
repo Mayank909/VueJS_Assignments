@@ -2,7 +2,7 @@
   <v-row justify="center">
     <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
-        <v-card-title>
+        <v-card-title class="text-center">
           <span class="text-h5">Sign Up</span>
         </v-card-title>
         <v-card-text>
@@ -17,14 +17,14 @@
                   required
                 ></v-text-field>
                 <p
-                      style="color: #b00a20"
-                      class="mr-2 ml-2 text-caption"
-                      :class="error.$color"
-                      v-for="error of v$.firstName.$errors"
-                      :key="error.$uid"
-                    >
-                      {{ error.$message }}
-                    </p> 
+                  style="color: #b00a20"
+                  class="mr-2 ml-2 text-caption"
+                  :class="error.$color"
+                  v-for="error of v$.firstName.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}
+                </p>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
@@ -35,14 +35,14 @@
                   required
                 ></v-text-field>
                 <p
-                      style="color: #b00a20"
-                      class="mr-2 ml-2 text-caption"
-                      :class="error.$color"
-                      v-for="error of v$.lastName.$errors"
-                      :key="error.$uid"
-                    >
-                      {{ error.$message }}
-                    </p> 
+                  style="color: #b00a20"
+                  class="mr-2 ml-2 text-caption"
+                  :class="error.$color"
+                  v-for="error of v$.lastName.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}
+                </p>
               </v-col>
               <v-col cols="12">
                 <v-text-field
@@ -53,14 +53,14 @@
                   required
                 ></v-text-field>
                 <p
-                      style="color: #b00a20"
-                      class="mr-2 ml-2 text-caption"
-                      :class="error.$color"
-                      v-for="error of v$.email.$errors"
-                      :key="error.$uid"
-                    >
-                      {{ error.$message }}
-                    </p> 
+                  style="color: #b00a20"
+                  class="mr-2 ml-2 text-caption"
+                  :class="error.$color"
+                  v-for="error of v$.email.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}
+                </p>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
@@ -72,14 +72,14 @@
                   required
                 ></v-text-field>
                 <p
-                      style="color: #b00a20"
-                      class="mr-2 ml-2 text-caption"
-                      :class="error.$color"
-                      v-for="error of v$.password.$errors"
-                      :key="error.$uid"
-                    >
-                      {{ error.$message }}
-                    </p> 
+                  style="color: #b00a20"
+                  class="mr-2 ml-2 text-caption"
+                  :class="error.$color"
+                  v-for="error of v$.password.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}
+                </p>
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
@@ -91,19 +91,17 @@
                   required
                 ></v-text-field>
                 <p
-                      style="color: #b00a20"
-                      class="mr-2 ml-2 text-caption"
-                      :class="error.$color"
-                      v-for="error of v$.ConfirmPassword.$errors"
-                      :key="error.$uid"
-                    >
-                      {{ error.$message }}
-                    </p> 
+                  style="color: #b00a20"
+                  class="mr-2 ml-2 text-caption"
+                  :class="error.$color"
+                  v-for="error of v$.ConfirmPassword.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}
+                </p>
               </v-col>
               <v-col cols="12" sm="6">
-                <v-radio-group v-model="gender"
-                :error="v$.gender.$error"
-                >
+                <v-radio-group v-model="gender" :error="v$.gender.$error">
                   <div class="d-flex">
                     <span class="mt-2 mr-1">Gender*</span>
                     <v-radio
@@ -118,23 +116,32 @@
                     ></v-radio>
                   </div>
                 </v-radio-group>
-               <p
-                      style="color: #b00a20"
-                      class="mr-2 ml-2 text-caption"
-                      :class="error.$color"
-                      v-for="error of v$.gender.$errors"
-                      :key="error.$uid"
-                    >
-                      {{ error.$message }}
-                    </p> 
+                <p
+                  style="color: #b00a20"
+                  class="mr-2 ml-2 text-caption"
+                  :class="error.$color"
+                  v-for="error of v$.gender.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}
+                </p>
               </v-col>
             </v-row>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="primary" text @click="$emit('closeDialog')">
+            <v-card-actions class="d-flex justify-center">
+              <v-btn
+                class="ml-2 mr-2"
+                style="background-color: #b99272"
+                @click="$emit('closeDialog')"
+              >
                 Cancel
               </v-btn>
-              <v-btn color="primary" text @click="addNewUser"> Sign Up </v-btn>
+              <v-btn
+                class="ml-2 mr-2"
+                style="background-color: #b99272"
+                @click="addNewUser"
+              >
+                Sign Up
+              </v-btn>
             </v-card-actions>
           </v-container>
         </v-card-text>
@@ -178,7 +185,10 @@ export default {
         $autoDirty: true,
       },
       ConfirmPassword: {
-        required: helpers.withMessage("Confirm Password is Required!", required),
+        required: helpers.withMessage(
+          "Confirm Password is Required!",
+          required
+        ),
         $autoDirty: true,
       },
       gender: {
@@ -190,28 +200,28 @@ export default {
   methods: {
     //Database Operation
     async addNewUser() {
-       this.v$.$touch();
+      this.v$.$touch();
       // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
       if (!this.v$.$error) {
-      this.$emit("signUp");
-      const user = {
-        active: Boolean(this.isActive),
-        first_name: this.firstName,
-        last_name: this.lastName,
-        email: this.email,
-        password: this.password,
-        type: this.selectedType,
-        gender: this.gender,
-      };
-      const serviceApi = new Services();
-      await serviceApi
-        .postUser("users", user)
-        .then((res) => {
-          console.log("added data successfully. " + res);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        this.$emit("signUp");
+        const user = {
+          active: Boolean(this.isActive),
+          first_name: this.firstName,
+          last_name: this.lastName,
+          email: this.email,
+          password: this.password,
+          type: this.selectedType,
+          gender: this.gender,
+        };
+        const serviceApi = new Services();
+        await serviceApi
+          .postUser("users", user)
+          .then((res) => {
+            console.log("added data successfully. " + res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
     },
   },
