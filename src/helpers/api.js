@@ -38,6 +38,7 @@ export default class Services {
   async put(collectionName, id, payload) {
     await db.collection(collectionName).doc(id).update(payload);
   }
+  //  Normal Services
   sortData(clickValue, headers, tableData) {
     for (let header of headers) {
       header.sortable = false;
