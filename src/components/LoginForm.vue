@@ -12,23 +12,55 @@
                 <v-text-field
                   label="Email*"
                   color="primary"
+                  v-model="email"
+                  :error="v$.email.$error"
                   required
                 ></v-text-field>
+                <p
+                  style="color: #b00a20"
+                  class="mr-2 ml-2 text-caption"
+                  :class="error.$color"
+                  v-for="error of v$.email.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}
+                </p>
               </v-col>
               <v-col cols="12">
                 <v-text-field
                   label="Password*"
+                  v-model="password"
+                  :error="v$.password.$error"
                   color="primary"
                   type="password"
                   required
                 ></v-text-field>
+                <p
+                  style="color: #b00a20"
+                  class="mr-2 ml-2 text-caption"
+                  :class="error.$color"
+                  v-for="error of v$.password.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}
+                </p>
               </v-col>
             </v-row>
             <v-card-actions class="d-flex justify-center">
-              <v-btn class="ml-2 mr-2" style="background-color: #b99272" text @click="$emit('closeDialog')">
+              <v-btn
+                class="ml-2 mr-2"
+                style="background-color: #b99272"
+                text
+                @click="$emit('closeDialog')"
+              >
                 Cancel
               </v-btn>
-              <v-btn class="ml-2 mr-2" style="background-color: #b99272" text @click="$emit('login')">
+              <v-btn
+                class="ml-2 mr-2"
+                style="background-color: #b99272"
+                text
+                @click="loginUser"
+              >
                 Login
               </v-btn>
             </v-card-actions>
@@ -39,10 +71,38 @@
   </v-row>
 </template>
 <script>
+import useVuelidate from "@vuelidate/core";
+import { required, helpers, email } from "@vuelidate/validators";
 export default {
   data: () => ({
+    v$: useVuelidate(),
     dialog: true,
+    email: "",
+    password: "",
   }),
+  validations() {
+    return {
+      email: {
+        email,
+        required: helpers.withMessage("Email Name is Required!", required),
+        $autoDirty: true,
+      },
+      password: {
+        required: helpers.withMessage("Password is Required!", required),
+        $autoDirty: true,
+      },
+    };
+  },
+  methods: {
+    //Database Operation
+    async loginUser() {
+      this.v$.$touch();
+      // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
+      if (!this.v$.$error) {
+        this.$emit("login");
+      }
+    },
+  },
 };
 </script>
 <style></style>
