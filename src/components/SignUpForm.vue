@@ -165,6 +165,7 @@ export default {
     dialog: true,
     isActive: true,
     selectedType: "User",
+    id: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -218,11 +219,25 @@ export default {
   },
   methods: {
     //Database Operation
+    getRandomId() {
+      const characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      let result = "";
+      const charactersLength = characters.length;
+      for (let i = 0; i < 5; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * charactersLength)
+        );
+      }
+      return result;
+    },
     async addNewUser() {
       this.v$.$touch();
       // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
       if (!this.v$.$error) {
         this.$emit("signUp");
+        this.id =
+          String(Math.floor(Math.random() * 100) + 1) + this.getRandomId();
         const user = {
           active: Boolean(this.isActive),
           first_name: this.firstName,
@@ -231,7 +246,7 @@ export default {
           password: this.password,
           type: this.selectedType,
           gender: this.gender,
-          id : Math.floor(Math.random() * 100) + 1,
+          id: this.id,
         };
         const serviceApi = new Services();
         await serviceApi

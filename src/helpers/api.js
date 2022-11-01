@@ -1,5 +1,4 @@
 import { setDoc, doc } from "firebase/firestore";
-import { getDatabase, ref, set } from "firebase/database";
 import { db } from "@/firebase";
 
 export default class Services {
@@ -7,8 +6,8 @@ export default class Services {
     const docRef = doc(db, collectionName, id);
     setDoc(docRef, payload);
   }
-  async postUser(collectionName, payload){
-     await db.collection("users").add(payload);
+  async postUser(collectionName, payload) {
+    await db.collection(collectionName).add(payload);
   }
   async getAll(collectionName) {
     const dataArray = [];
