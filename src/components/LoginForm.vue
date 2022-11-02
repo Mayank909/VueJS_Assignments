@@ -119,7 +119,8 @@ export default {
       const colRef = collection(db, "users");
       const q = query(
         colRef,
-        where("email", "==", this.email), where("password", "==", this.password)
+        where("email", "==", this.email),
+        where("password", "==", this.password)
       );
       onSnapshot(q, (snapshot) => {
         snapshot.docs.forEach((doc) => {
@@ -132,7 +133,10 @@ export default {
       // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
       if (!this.v$.$error && !(this.loggedInUser == null)) {
         this.$emit("login");
-        console.log(this.loggedInUser);
+        sessionStorage.setItem(
+          "loggedInUser",
+          JSON.stringify(this.loggedInUser)
+        );
       }
     },
   },
