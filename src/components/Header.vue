@@ -17,11 +17,14 @@
 
       <v-tabs align-with-title>
         <v-btn>Home</v-btn>
-        <v-btn :color="btnColorLogin" dark @click="displayLogin()">
+        <v-btn :color="btnColorLogin" v-if="!isLoggedIn" dark @click="displayLogin()">
           Login
         </v-btn>
-        <v-btn :color="btnColorSignUp" dark @click="displaySignUp()">
+        <v-btn :color="btnColorSignUp" v-if="!isLoggedIn" dark @click="displaySignUp()">
           Sign Up
+        </v-btn>
+        <v-btn :color="btnColorLogout" v-if="isLoggedIn" dark @click="logout()">
+          Logout
         </v-btn>
       </v-tabs>
 
@@ -57,8 +60,10 @@ export default {
       loginComponent: "",
       loginClick: false,
       signUpClick: false,
+      isLoggedIn: false,
       btnColorLogin: "",
       btnColorSignUp: "",
+      btnColorLogout: "",
     };
   },
   components: {
@@ -73,6 +78,7 @@ export default {
     },
     loginSuccess() {
       this.loginClick = false;
+      this.isLoggedIn = true;
       this.btnColorLogin = "";
     },
     closeLogin() {
@@ -92,6 +98,11 @@ export default {
       this.signUpClick = false;
       this.btnColorSignUp = "";
     },
+    logout(){
+      this.btnColorLogout = "primary";
+      sessionStorage.clear();
+      this.isLoggedIn = false;
+    }
   },
 };
 </script>
