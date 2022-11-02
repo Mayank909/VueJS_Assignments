@@ -105,7 +105,7 @@ export default {
       },
       loggedInUser: {
         required: helpers.withMessage(
-          "Given Email and Password do not exist, Sign Up for the First.",
+          "Given Email and Password do not exist, Sign Up First.",
           required
         ),
         $autoDirty: true,
@@ -115,20 +115,20 @@ export default {
   methods: {
     //Database Operation
     isAccountExist() {
-      this.v$.$reset();
+      this.v$.$touch();
       const colRef = collection(db, "users");
       const q = query(
         colRef,
-        where("email", "==", this.email, "AND", "password", "==", this.password)
+        where("email", "==", this.email), where("password", "==", this.password)
       );
       onSnapshot(q, (snapshot) => {
         snapshot.docs.forEach((doc) => {
           this.loggedInUser = { ...doc.data() };
         });
+        this.loginUser();
       });
     },
     loginUser() {
-      this.v$.$touch();
       // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
       if (!this.v$.$error && !(this.loggedInUser == null)) {
         this.$emit("login");
