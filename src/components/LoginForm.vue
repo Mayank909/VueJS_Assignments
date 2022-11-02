@@ -133,6 +133,9 @@ export default {
       // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
       if (!this.v$.$error && !(this.loggedInUser == null)) {
         this.$emit("login");
+        if(this.loggedInUser.type === "admin"){
+          this.$router.push("/dashboard");
+        }
         sessionStorage.setItem(
           "loggedInUser",
           JSON.stringify(this.loggedInUser)
